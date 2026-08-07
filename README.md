@@ -10,6 +10,10 @@ hours and the cost is less than 1 US dollar. Have fun :)
 
 Spell is a **proof protocol**, not a proof checker: it does not run Lean/Coq
 verification — the output is reviewed prose, never a machine-checked proof.
+Although it does not completely prove the theorems for you, it helps you
+materialize the rough ideas properly in the current literature and visualize
+the potential gaps. You can use it for multiple rounds and add new ideas when
+needed to deepen your thoughts.
 
 ## What it is
 
