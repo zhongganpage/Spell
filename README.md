@@ -1,8 +1,8 @@
 # Spell — An Adversarial Multi-Agent Prover
 
 Spell is a working protocol for proving mathematical theorems with multiple
-AI agents that **distrust each other**. Feed it a rough idea; it returns a
-manuscript — in bounded runs (quick 30 min · medium 60 min · long 2 h · superlong 4 h), with you deciding between runs.
+AI agents that **distrust each other**. Feed it a rough idea; it returns a fine
+manuscript.
 
 > **Input:** a rough idea → **Output:** a manuscript.
 
