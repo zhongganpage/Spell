@@ -1,8 +1,10 @@
 # Spell — An Adversarial Multi-Agent Proof Protocol
 
-Spell is a working protocol for proving mathematical theorems with multiple
-AI agents that **distrust each other**. Feed it a rough idea; it returns a
-finer, better-reviewed manuscript.
+Spell is a **universal proof enhancement protocol** based on adversarial
+multi-agent review procedures. You can use it on ANY agentic systems such as
+Claude Code, CodeX, Kimi Code and etc. My personal experience is that for
+Kimi Code + Deepseek-v4-flash, it will output a fine manuscript within 2
+hours and the cost is less than 1 US dollar. Have fun :)
 
 > **Input:** a rough idea → **Output:** a manuscript.
 

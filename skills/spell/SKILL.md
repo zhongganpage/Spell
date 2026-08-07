@@ -1,6 +1,6 @@
 ---
 name: spell
-description: Run Spell, the adversarial multi-agent proof protocol for mathematical theorems — rough idea in, finer manuscript out, in bounded runs with user decisions between runs. Use when the user asks to run Spell, prove or review a mathematical theorem, turn a rough idea into a manuscript, run the review panel or high-level check on a draft, or work on an open problem under Spell's protocol.
+description: Spell is a universal proof enhancement protocol based on adversarial multi-agent review procedures. You can use it on ANY agentic systems such as Claude Code, CodeX, Kimi Code and etc. My personal experience is that for Kimi Code + Deepseek-v4-flash, it will output a fine manuscript within 2 hours and the cost is less than 1 US dollar. Have fun :)
 ---
 
 # Spell — Core
