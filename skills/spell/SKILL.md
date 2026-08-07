@@ -1,6 +1,6 @@
 ---
 name: spell
-description: Spell is a universal proof enhancement protocol based on adversarial multi-agent review procedures. You can use it on ANY agentic systems such as Claude Code, CodeX, Kimi Code and etc. My personal experience is that for Kimi Code + Deepseek-v4-flash, it will output a fine manuscript within 2 hours and the cost is less than 1 US dollar. Have fun :)
+description: Spell is a universal proof enhancement protocol based on adversarial multi-agent review procedures. You can use it on ANY agentic systems such as Claude Code, CodeX, Kimi Code and etc. My personal experience is that for Kimi Code + Deepseek-v4-flash, it will output a fine manuscript within 2 hours and the cost is less than 1 US dollar. You can also personalize it easily by using agents. Have fun :)
 ---
 
 # Spell — Core

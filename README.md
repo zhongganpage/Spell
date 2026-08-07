@@ -13,7 +13,8 @@ verification — the output is reviewed prose, never a machine-checked proof.
 Although it does not completely prove the theorems for you, it helps you
 materialize the rough ideas properly in the current literature and visualize
 the potential gaps. You can use it for multiple rounds and add new ideas when
-needed to deepen your thoughts.
+needed to deepen your thoughts. You can also personalize it easily by using
+agents.
 
 ## What it is
 
