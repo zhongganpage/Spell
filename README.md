@@ -101,9 +101,7 @@ skills/spell/
 ## Starting a project
 
 1. Load `core.md` (or invoke the `spell` skill).
-2. Answer the startup questions: output form (PDF / LaTeX / Markdown / HTML),
-   run envelope (`RUN_LENGTH`: `quick` 30 min · `medium` 60 min · `long` 2 h ·
-   `superlong` 4 h; default `medium`), and the exterior agent (`X_PROVIDER`,
+2. Answer the startup questions: output form (PDF / LaTeX / Markdown / HTML) and the exterior agent (`X_PROVIDER`,
    `X_MODEL`, `X_ACCESS` — a provider API key or the local Codex CLI).
 3. Create the dossier from `modules/dossier-template.md`: lock the problem
    statement and notation, open the first thread.
