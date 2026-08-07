@@ -6,7 +6,8 @@ returns a manuscript.
 
 > **Input:** a rough idea → **Output:** a manuscript.
 >
-> Each run is time-boxed to a run envelope set at project start (`RUN_LENGTH`: `quick` 30 min · `medium` 60 min · `long` 2 h · `superlong` 4 h; default `medium`); longer projects span several runs with
+> Each run is time-boxed to a run envelope (`RUN_LENGTH`) set at project
+> start; longer projects span several runs with
 > your decisions in between.
 
 ## How it works
@@ -48,7 +49,7 @@ own homework).
 | File | Role |
 |---|---|
 | `README.md` | This overview. |
-| `definition.md` | The vocabulary: rough idea, draft, manuscript, progress report, exterior agent, review report, rebuttal, ranking, high-level check. Also fixes the **output form** and the **run envelope** (`RUN_LENGTH` — `quick` 30 min · `medium` 60 min · `long` 2 h · `superlong` 4 h), asked once at project start. |
+| `definition.md` | The vocabulary: rough idea, draft, manuscript, progress report, exterior agent, review report, rebuttal, ranking, high-level check. Also fixes the **output form** and the **run envelope** (`RUN_LENGTH`), asked once at project start. |
 | `review-panel.md` | The five-agent panel — 2 internal reviewers + 1 exterior reviewer (external agent API) + 1 ranking agent + 1 manuscript agent; phases A–F. |
 | `high-level-check.md` | The independent novelty/sufficiency gate. |
 | `protocol.md` | The working protocol: dossier, attempts log, transformation toolkit, stuck ladder, anti-give-up rules, verification ledger, startup checklist. |
@@ -57,13 +58,13 @@ own homework).
 
 1. Read `definition.md` and `protocol.md` (especially §10, the startup
    checklist).
-2. Tell Spell the **output form** (PDF / LaTeX / Markdown / HTML) — it asks
+2. **Configure the exterior reviewer — the very first question.** Set the
+   variables `X_PROVIDER`, `X_MODEL`, `X_ACCESS` (provider API key, or the
+   locally installed Codex CLI; keys live in environment variables, never in
+   the dossier).
+3. Tell Spell the **output form** (PDF / LaTeX / Markdown / HTML) — it asks
    once, at the beginning.
-3. Fix the **run envelope** (`RUN_LENGTH`: `quick` 30 min · `medium` 60 min ·
-   `long` 2 h · `superlong` 4 h; default `medium`).
-4. Configure the **exterior panel agent** — set the variables `X_PROVIDER`,
-   `X_MODEL`, `X_ACCESS` (provider API key, or the locally installed Codex
-   CLI; keys live in environment variables, never in the dossier).
+4. Fix the **run envelope** (`RUN_LENGTH`, chosen at project start).
 5. Create the dossier: lock the problem statement, fix the notation, open
    the first thread.
 6. Input the rough idea. From then on: draft → panel → high-level check →
@@ -79,9 +80,8 @@ own homework).
   each runs in a fresh context, and one reviewer (X) comes from a different
   company's model entirely.
 - **Runs are bounded, the user decides.** At most `RUN_LENGTH` of agent work
-  per run — `quick` 30 min · `medium` 60 min · `long` 2 h · `superlong` 4 h
-  (chosen at project start); every run ends with a deliverable and a decision
-  list for you.
+  per run (chosen at project start); every run ends with a deliverable and a
+  decision list for you.
 - **Recording is mandatory.** Progress is measured in dossier entries, not
   solutions; dead ends and rejections are data.
 - **Nothing is a certificate.** Panel verdicts and high-level checks are

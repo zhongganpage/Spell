@@ -25,14 +25,18 @@ apply. Documents referenced here: `definition.md`, `review-panel.md`,
    previous context window.
 5. **Runs are time-boxed; the user decides between runs.** A run ends with a
    deliverable and a decision list within the run budget (`RUN_LENGTH`,
-   default `medium` = 60 min); Spell never operates autonomously across days
+   chosen at project start); Spell never operates autonomously across days
    or months.
+6. **Everything is versioned.** Every draft, progress report, manuscript, and
+   update to the problem statement carries a version label (`v1`, `v2`, …).
+   Nothing is cited, reviewed, or built upon without naming its version; an
+   unversioned artifact is not a valid reference.
 
 ## 2. The pipeline
 
 ```
 rough idea
-   │  (startup: output form, run envelope, exterior agent, dossier)
+   │  (startup: exterior reviewer, output form, run envelope, dossier)
    ▼
 working loop ───────────────────────────────┐  (exploration, §4–§6)
    │                                        │
@@ -50,8 +54,7 @@ deliverable + decision list → user → (next run, if the user continues)
 ```
 
 **The run envelope.** A Spell run is time-boxed: at most **`RUN_LENGTH`** of
-agent work per run — `quick` 30 min · `medium` 60 min · `long` 2 h ·
-`superlong` 4 h, chosen at project start (default `medium`, 60 min) — after
+agent work per run, chosen at project start — after
 which the run must produce a deliverable and a decision list, and control
 returns to the user. A full rough-idea → manuscript cycle
 may span several runs: a run may end (1) after the working loop, with a
@@ -87,6 +90,16 @@ Rules that make the dossier work: append-only (never rewrite history); dated;
 notation-locked; every entry ends with a next step; a fresh session reads the
 dossier in full before anything else.
 
+**Artifact versions.** Every draft, progress report, and manuscript carries a
+version (`v1`, `v2`, …), incremented each time a new one is produced; review
+reports, cross-judgements, rebuttals, and rankings are versioned the same way.
+Updates to the locked problem statement are versioned too (`Q v1` → `Q v2`,
+…), each with a dated note of what changed and why — the statement is
+append-only, never silently rewritten. Ledger rows cite the artifact versions
+they record (e.g. "draft v2"), the panel reviews a specific draft version, a
+manuscript names the draft version it improves on, and anything that builds on
+an artifact names its version.
+
 ## 4. The exploration loop
 
 Every session — and every hour of a long session — runs this loop:
@@ -114,7 +127,7 @@ Before ending, in this order:
 3. Write the next step. If you cannot write one, walk down the Stuck Ladder
    (§6) until you can — creating a next step is part of the work.
 
-When the run budget (`RUN_LENGTH`, default `medium` 60 min) is nearly spent, the run must not start
+When the run budget (`RUN_LENGTH`) is nearly spent, the run must not start
 new work: it closes the current entry, writes the run's deliverable — a
 draft, a manuscript, or a **progress report** (what was tried, what stands,
 what was ruled out, and the decision list) — and stops.
@@ -299,22 +312,21 @@ never a formal proof, and it never overrides a rejected claim in the ledger.
 
 When a new Spell project begins, in order:
 
-1. **Ask the user the output form** — PDF, LaTeX, Markdown, or HTML — and
+1. **Configure the exterior reviewer — the very first question.** Ask the
+   user for the three variables `X_PROVIDER`, `X_MODEL`, `X_ACCESS`
+   (`review-panel.md`, "The exterior agent (X)"). `X_ACCESS` is `api` (key in
+   an environment variable or secrets store — never in the dossier or any
+   report) or `codex` (the pre-installed Codex CLI, no key needed). Current
+   default: `X_PROVIDER=kimi`, `X_MODEL=k2.7`, `X_ACCESS=api`
+   (`MOONSHOT_API_KEY`). If the configured access is unavailable at panel
+   start, X is unavailable and the run records the reduced diversity (§8).
+2. **Ask the user the output form** — PDF, LaTeX, Markdown, or HTML — and
    record the answer (`definition.md`, "Output form").
-2. **Fix the run envelope.** `RUN_LENGTH` — `quick` 30 min · `medium`
-   60 min · `long` 2 h · `superlong` 4 h; default `medium` (60 min). Record it
+3. **Fix the run envelope.** `RUN_LENGTH`, chosen at project start. Record it
    in the dossier.
-3. **Configure the exterior panel agent.** Ask the user for the three
-   variables `X_PROVIDER`, `X_MODEL`, `X_ACCESS` (`review-panel.md`,
-   "The exterior agent (X)"). `X_ACCESS` is `api` (key in an environment
-   variable or secrets store — never in the dossier or any report) or
-   `codex` (the pre-installed Codex CLI, no key needed). Current default:
-   `X_PROVIDER=kimi`, `X_MODEL=k2.7`, `X_ACCESS=api` (`MOONSHOT_API_KEY`).
-   If the configured access is unavailable at panel start, X is unavailable
-   and the run records the reduced diversity (§8).
 4. **Create the dossier** (template in §12 below), filling in the locked
-   problem statement, notation, output form, run envelope, and exterior
-   agent.
+   problem statement (`Q v1`), notation, output form, run envelope, and
+   exterior agent.
 5. **Fix the internal record format** (LaTeX for math-heavy projects,
    Markdown otherwise) for panel reports, rebuttals, rankings, and ledger
    entries.
@@ -375,9 +387,12 @@ by appending.
 
 <precise statement, all definitions>
 
+**Statement version:** Q v1 (locked <date>) — every update is a new version
+(`Q v2`, …), dated, with a note on what changed and why. Never rewritten.
+
 **Output form:** <PDF | LaTeX | Markdown | HTML — asked at project start>
 
-**Run envelope:** RUN_LENGTH=<quick | medium | long | superlong> — 30 min · 60 min · 2 h · 4 h per run (chosen at project start)
+**Run envelope:** RUN_LENGTH=<value chosen at project start>
 
 **Exterior panel agent:** <provider/model — configured at start; credentials
 kept in environment variables or a secrets store, never in this dossier>
@@ -414,7 +429,7 @@ next:    ...
 
 ## Panel & check ledger
 
-| date | artifact | panel (A1,A2,X,R,M) | panel verdict | high-level check | routing |
+| date | artifact (version) | panel (A1,A2,X,R,M) | panel verdict | high-level check | routing |
 
 > In the panel cell, record which agents actually ran — e.g. `X:ok` or
 > `X:unavailable — reduced diversity` (`protocol.md` §8).

@@ -105,7 +105,9 @@ Write the manuscript from the ranking and the record below. Obligations:
    explicitly dismissed with reason, or carried forward as an open item.
 3. Ranking deviations are visible — if you disagree with a ranked item, flag
    it [ranking deviation] with a reason; never drop it silently.
-4. Include a section "How this manuscript improves on the initial draft".
+4. Include a section "How this manuscript improves on the initial draft
+   (draft vN)". Give this manuscript its own version (`v1`, `v2`, …) and name
+   it in the header.
 5. Output form: <chosen form>.
 
 --- LOCKED PROBLEM STATEMENT ---

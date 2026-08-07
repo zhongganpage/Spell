@@ -101,8 +101,9 @@ skills/spell/
 ## Starting a project
 
 1. Load `core.md` (or invoke the `spell` skill).
-2. Answer the startup questions: output form (PDF / LaTeX / Markdown / HTML) and the exterior agent (`X_PROVIDER`,
-   `X_MODEL`, `X_ACCESS` — a provider API key or the local Codex CLI).
+2. The **very first startup question** is the exterior reviewer setup —
+   `X_PROVIDER`, `X_MODEL`, `X_ACCESS` (a provider API key or the local Codex
+   CLI). Then the output form (PDF / LaTeX / Markdown / HTML).
 3. Create the dossier from `modules/dossier-template.md`: lock the problem
    statement and notation, open the first thread.
 4. Input the rough idea. From then on: draft → panel → high-level check →
@@ -116,11 +117,13 @@ skills/spell/
   each runs in a fresh context, and one reviewer comes from a different
   company's model entirely.
 - **Runs are bounded; the user decides.** At most `RUN_LENGTH` of agent work
-  per run — `quick` 30 min · `medium` 60 min · `long` 2 h · `superlong` 4 h
-  (chosen at project start) — every run ends with a deliverable and a decision
-  list for you.
+  per run (chosen at project start) — every run ends with a deliverable and a
+  decision list for you.
 - **Recording is mandatory.** Progress is measured in dossier entries, not
   solutions; dead ends and rejections are data.
+- **Everything is versioned.** Every draft, report, and manuscript carries a
+  version (`v1`, `v2`, …), and so does every update to the problem statement;
+  nothing is cited without its version.
 - **Nothing is a certificate.** Panel verdicts and high-level checks are
   independent review, not formal proof.
 

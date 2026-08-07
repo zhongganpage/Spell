@@ -14,8 +14,7 @@ Nothing else is delivered. Everything between the two is internal machinery.
 ## The run envelope
 
 A Spell run is **time-boxed**: at most **`RUN_LENGTH`** of agent work per
-run — `quick` (30 min) · `medium` (60 min) · `long` (2 h) · `superlong`
-(4 h), chosen at project start (default `medium`, 60 min) — after which the
+run, chosen at project start — after which the
 run must produce a deliverable and a decision list, and control returns to
 the user. Spell never operates autonomously across days or
 months; between runs the user decides — continue, redirect, stop, or a new
@@ -46,7 +45,7 @@ Properties of a draft:
   it, and it has no authority.
 - It is one agent's snapshot — not a consensus, not a final product.
 - A project may produce many drafts; each is produced independently by a
-  single agent at a single time.
+  single agent at a single time, and each carries a version (`v1`, `v2`, …).
 - A draft is never delivered.
 
 ### manuscript
@@ -61,6 +60,8 @@ Properties of a manuscript:
   cross-judgements, and the rebuttals.
 - It must state, in its own remarks, how the current argument improves on the
   initial draft.
+- It carries a version (`v1`, `v2`, …) and names the draft version it
+  improves on.
 - It inherits the output form chosen at project start.
 - It is still a claim, not a certificate: it passes through the high-level
   check before delivery, and every mathematical claim inside it remains
@@ -70,8 +71,9 @@ Properties of a manuscript:
 The deliverable of a run that did not culminate in a draft or manuscript: a
 time-boxed summary of the run — what was tried, what stands, what was ruled
 out — plus a decision list for the user and the next run's recommended focus.
-It is the standard output of a `long` or `superlong` run on a long-horizon problem, and it
-is delivered like any other run deliverable.
+It is the standard output of a run on a long-horizon problem, and it
+is delivered like any other run deliverable. It carries a version (`v1`,
+`v2`, …) like every other deliverable.
 
 ### exterior agent
 A review-panel reviewer from a different provider than the internal harness.
@@ -106,7 +108,9 @@ sufficiency. Verdicts and decision routing in `high-level-check.md`.
 
 ## Output form — asked once, at the start
 
-At the very beginning of a Spell project the user is asked, in plain terms:
+The **very first question** of a Spell project is the exterior reviewer setup
+(`protocol.md` §10); the output form is the next question, asked once, still
+before any work starts. In plain terms:
 
 > Which form should the final manuscript take — PDF, LaTeX, Markdown, or HTML?
 
@@ -128,3 +132,6 @@ never converted to the output form unless the user asks.
    reason, are recorded as a dated ledger event.
 4. A run respects its envelope: it ends with a deliverable and a decision
    list within the run budget, and it never continues autonomously beyond it.
+5. Every artifact — draft, report, manuscript, ranking, and any update to the
+   problem statement — carries a version (`v1`, `v2`, …); artifacts cite the
+   versions they build on or replace.

@@ -1,6 +1,7 @@
 # Spell — Exterior Agent (X): configuration
 
-Load this module at project start or when wiring X. X gives the panel
+Load this module at project start — configuring X is the **very first
+startup question** (`protocol.md` §10) — or when wiring X. X gives the panel
 genuine model diversity — it is the one reviewer that does not share the
 internal harness's weights and blind spots.
 

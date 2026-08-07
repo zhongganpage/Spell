@@ -146,8 +146,7 @@ The two reviewers' final judgments, in their own words: *"The first five items a
 After this report, the user made two decisions that modify the design:
 
 1. **Run envelope.** Spell runs are time-boxed to **`RUN_LENGTH`** of agent
-   work per run — `quick` 30 min · `medium` 60 min · `long` 2 h · `superlong`
-   4 h, chosen at project start (default `medium`, 60 min); every run ends
+   work per run, chosen at project start; every run ends
    with a deliverable (draft, manuscript, or progress report) and a decision
    list for the user. Spell never operates autonomously across days or
    months. This resolves tension 1 and item 15

@@ -1,8 +1,8 @@
 # Spell — Dossier Template
 
 Copy this file per problem. Fill in the locked section once; the rest grows
-by appending. Rules: append-only, dated, notation-locked, every entry ends
-with a next step.
+by appending. Rules: append-only, dated, notation-locked, versioned, every
+entry ends with a next step.
 
 ```markdown
 # Dossier: <short problem name>
@@ -13,9 +13,12 @@ with a next step.
 
 <precise statement, all definitions>
 
+**Statement version:** Q v1 (locked <date>) — every update is a new version
+(`Q v2`, …), dated, with a note on what changed and why. Never rewritten.
+
 **Output form:** <PDF | LaTeX | Markdown | HTML — asked at project start>
 
-**Run envelope:** RUN_LENGTH=<quick | medium | long | superlong> — 30 min · 60 min · 2 h · 4 h per run (chosen at project start)
+**Run envelope:** RUN_LENGTH=<value chosen at project start>
 
 **Exterior panel agent:** X_PROVIDER=<provider> · X_MODEL=<model> ·
 X_ACCESS=<api | codex> (credentials in environment variables or a secrets
@@ -53,7 +56,7 @@ next:    ...
 
 ## Panel & check ledger
 
-| date | artifact | panel (A1,A2,X,R,M) | panel verdict | high-level check | routing |
+| date | artifact (version) | panel (A1,A2,X,R,M) | panel verdict | high-level check | routing |
 
 > In the panel cell, record which agents actually ran — e.g. `X:ok` or
 > `X:unavailable — reduced diversity`.

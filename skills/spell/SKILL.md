@@ -1,28 +1,39 @@
 ---
 name: spell
-description: Run Spell, the adversarial multi-agent prover for mathematical theorem proofs — rough idea in, manuscript out, in bounded runs (quick 30 min · medium 60 min · long 2 h · superlong 4 h) with user decisions between runs. Use when the user asks to run Spell, prove or review a mathematical theorem, turn a rough idea into a manuscript, run the review panel or high-level check on a draft, or work on an open problem under Spell's protocol.
+description: Run Spell, the adversarial multi-agent prover for mathematical theorem proofs — rough idea in, manuscript out, in bounded runs with user decisions between runs. Use when the user asks to run Spell, prove or review a mathematical theorem, turn a rough idea into a manuscript, run the review panel or high-level check on a draft, or work on an open problem under Spell's protocol.
 ---
 
 # Spell — Core
 
 Adversarial multi-agent prover for mathematical theorem proofs. **Contract:**
 rough idea in → manuscript out. **Run envelope:** a variable `RUN_LENGTH`
-chosen at project start — `quick` (30 min) · `medium` (60 min) · `long` (2 h)
-· `superlong` (4 h) — of agent work per run; every run ends with a deliverable
-+ a decision list for the user; the dossier carries state across runs; the
-user decides between runs. Never run autonomously across days.
+chosen at project start, bounding the agent work per run; every run ends
+with a deliverable + a decision list for the user; the dossier carries state
+across runs; the user decides between runs. Never run autonomously across
+days.
 
 ## Vocabulary
-- **draft** — one agent's single-time report; never delivered.
+- **draft** — one agent's single-time report, versioned (`v1`, `v2`, …);
+  never delivered.
 - **manuscript** — post-panel report; the deliverable (output form chosen at
-  project start: PDF / LaTeX / Markdown / HTML).
-- **progress report** — run summary (tried / stands / ruled out) + decision list.
+  project start: PDF / LaTeX / Markdown / HTML); versioned, names the draft
+  version it improves on.
+- **progress report** — run summary (tried / stands / ruled out) + decision
+  list; versioned.
 - **review report · cross-judgement · rebuttal · ranking** — panel records.
 
 ## Pipeline
 working loop → draft → review panel → manuscript → high-level check →
 deliverable + decisions. Full detail in the repository's `reference/` folder
 (github.com/zhongganpage/Spell); paste-ready prompts in `./modules/prompts.md`.
+
+## Project start
+The **very first question** of a project is the exterior reviewer setup:
+`X_PROVIDER` / `X_MODEL` / `X_ACCESS` (`./modules/providers.md` — provider
+API env var or the local Codex CLI; default kimi/k2.7/api). Then the output
+form (PDF / LaTeX / Markdown / HTML), then the dossier. Ask these before any
+work starts; if the user has no exterior reviewer, record `X unavailable —
+reduced diversity` and proceed.
 
 ## Working loop
 LOAD dossier → ATTACK one toolkit move (`./modules/toolkit.md`) → RECORD
@@ -41,6 +52,9 @@ Never end a session on failure; end on the next action.
 4. **"Open" is a label, not a verdict.** Intuition = conjecture (recorded,
    then attacked); first test of truth is examples; check literature before
    "impossible".
+5. **Everything is versioned.** Every draft, report, manuscript, and update
+   to the problem statement carries a version (`v1`, `v2`, …); cite the
+   version you build on.
 
 ## Review panel — 5 agents, phases A–F
 A1, A2 internal + **X** exterior (variables `X_PROVIDER` / `X_MODEL` /

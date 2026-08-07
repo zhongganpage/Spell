@@ -48,8 +48,8 @@ what repair would fix it). "This is wrong" without a reason is not a review.
 
 ### The exterior agent (X)
 
-X is selected by three configuration variables, fixed once at project start
-(`protocol.md` §10):
+X is selected by three configuration variables, fixed once at project start —
+the very first startup question (`protocol.md` §10):
 
 | Variable | Meaning | Examples |
 |---|---|---|
@@ -107,10 +107,12 @@ X is selected by three configuration variables, fixed once at project start
 
 ## Inputs and outputs
 
-- **Input:** one draft (+ the definitions and cited results it uses) and the
-  project's locked problem statement.
-- **Output:** one manuscript, plus the full written record — 3 review
-  reports, 3 cross-judgements, 3 rebuttals, 1 ranking — kept in the dossier.
+- **Input:** one draft of a specific version (e.g. draft v2, plus the
+  definitions and cited results it uses) and the project's locked problem
+  statement (`Q` vN).
+- **Output:** one manuscript of a specific version, plus the full written
+  record — 3 review reports, 3 cross-judgements, 3 rebuttals, 1 ranking —
+  kept in the dossier. All panel artifacts carry versions.
 
 ## The phases
 
@@ -199,9 +201,13 @@ record (draft, reports, cross-judgements, rebuttals). M writes the
    ranking, it does not silently drop it: the manuscript flags the
    disagreement `[ranking deviation]` with a reason, so the user can audit.
 4. **Improvement remarks.** A dedicated section, "How this manuscript
-   improves on the initial draft", listing the concrete improvements: which
-   gaps were closed, which ideas were promoted, which attacks were rebutted.
-5. **Form.** The manuscript is written in the project's chosen output form.
+   improves on the initial draft (draft vN)", listing the concrete
+   improvements: which gaps were closed, which ideas were promoted, which
+   attacks were rebutted.
+5. **Version.** The manuscript carries its own version (`v1`, `v2`, …); the
+   panel ledger row records the draft version it was built from and the
+   manuscript version it produced.
+6. **Form.** The manuscript is written in the project's chosen output form.
 
 ## After the panel
 

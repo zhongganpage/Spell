@@ -48,7 +48,8 @@ implemented** — not every detail:
 
 ## The report
 
-The report is a single page of verdicts and reasons.
+The report is a single page of verdicts and reasons; it names the artifact
+and version it judged (e.g. `manuscript v1`).
 
 ### Novelty
 
