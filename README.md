@@ -49,7 +49,11 @@ working loop ────► draft ──► review panel ──► manuscript �
 
 ```
 Spell/
+├── README.md              this file
+├── LICENSE                MIT
+├── .gitignore             credentials stay out of git
 ├── core.md                distilled rules — the only thing loaded per run (~0.8k tokens)
+├── skills/spell/          the skill package — copy this folder to install
 ├── modules/               on-demand details
 │   ├── toolkit.md             transformation toolkit M1–M11 + stuck ladder
 │   ├── prompts.md             5 paste-ready prompts (reviewer, panel, ranking, manuscript, check)
@@ -60,8 +64,40 @@ Spell/
     ├── high-level-check.md · protocol.md · self-review.md
 ```
 
-Registered as a user-scope **Skill** (`spell`) for agent CLIs that support
-skills: 0 tokens until invoked.
+## Installing as a skill
+
+Spell ships as a **self-contained skill package** in `skills/spell/`:
+`SKILL.md` (the distilled core, ~0.8k tokens) plus the modules it references.
+An installed skill costs **0 tokens until invoked**; invoking loads only the
+core. All references inside the package are relative, so it is portable.
+
+**User scope — all projects on this machine:**
+
+```bash
+mkdir -p ~/.kimi-code/skills
+cp -r skills/spell ~/.kimi-code/skills/
+```
+
+Then invoke it in any session — e.g. ask your agent to "run Spell".
+
+**Project scope — one repository** (the layout Kimi Code discovers under
+`<project>/skills/`):
+
+```bash
+cp -r skills/spell <your-project>/skills/spell
+```
+
+**Verify:** start an agent session and ask for Spell's core; you should see
+the distilled rules. If your CLI does not discover the folder, load
+`core.md` manually — it is the same content.
+
+**Package layout:**
+
+```
+skills/spell/
+├── SKILL.md          frontmatter + distilled core (the only thing loaded)
+└── modules/          on-demand: toolkit · prompts · dossier-template · providers
+```
 
 ## Starting a project
 
