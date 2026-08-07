@@ -35,6 +35,13 @@ Run these moves *mechanically*; each move, even a failed one, is recorded.
   terminology. Find the nearest known theorem and read its proof *fully* —
   adapted, not cited. Check specifically whether the claim (or its negation)
   is already known — this distinguishes "open" from "impossible".
+- **M12 — Delegate.** The next attack is a massive or tedious task, and
+  finishing it still leaves distance to the ultimate goal — a long
+  computation, a mechanical case check, a literature sweep, a routine
+  sub-proof. Do not sink the run into it: spawn a fresh sub-agent with a
+  precise written task, keep thinking high-level while it works, record its
+  result in the dossier. Draft sub-agents record contradictions honestly;
+  manuscript sub-agents fix contradictions between agents. Full rule: §5.1.
 
 ## The stuck ladder
 

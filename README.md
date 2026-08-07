@@ -1,10 +1,13 @@
-# Spell — An Adversarial Multi-Agent Prover
+# Spell — An Adversarial Multi-Agent Proof Protocol
 
 Spell is a working protocol for proving mathematical theorems with multiple
-AI agents that **distrust each other**. Feed it a rough idea; it returns a fine
-manuscript.
+AI agents that **distrust each other**. Feed it a rough idea; it returns a
+finer, better-reviewed manuscript.
 
 > **Input:** a rough idea → **Output:** a manuscript.
+
+Spell is a **proof protocol**, not a proof checker: it does not run Lean/Coq
+verification — the output is reviewed prose, never a machine-checked proof.
 
 ## What it is
 
@@ -35,10 +38,13 @@ working loop ────► draft ──► review panel ──► manuscript �
 
 - **Working loop** — persistence protocol: dossier, attempts log, a Pólya-style
   transformation toolkit (compute examples, specialize, reformulate, …), a
-  stuck ladder with a minimum-output floor, and anti-give-up rules.
-- **Review panel** — 5 agents, phases A–F: three reviewers (two internal, one
-  **exterior agent** from a different provider via API or the local Codex
-  CLI), then ranking, then manuscript.
+  stuck ladder with a minimum-output floor, anti-give-up rules, and delegation
+  of tedious work to sub-agents (drafts stay high-level; manuscript sub-agents
+  fix contradictions between agents).
+- **Review panel** — 5 agents, phases A–F: three reviewers (A1
+  counterexample-hunter, A2 step-validator, and X — an **exterior agent**
+  from a different provider, or an internal A3 architecture-critic when you
+  have no X), then ranking, then manuscript.
 - **Verification** — every claim runs `claimed → under-review →
   accepted | rejected | counterexample`; no agent grades its own homework.
 - **High-level check** — an independent gate on novelty and sufficiency
@@ -101,9 +107,11 @@ skills/spell/
 ## Starting a project
 
 1. Load `core.md` (or invoke the `spell` skill).
-2. The **very first startup question** is the exterior reviewer setup —
-   `X_PROVIDER`, `X_MODEL`, `X_ACCESS` (a provider API key or the local Codex
-   CLI). Then the output form (PDF / LaTeX / Markdown / HTML).
+2. The **very first startup question** is a choice: set up the exterior
+   reviewer X — `X_PROVIDER`, `X_MODEL`, `X_ACCESS` (a provider API key or
+   the local Codex CLI) — or declare no X (the panel then runs internal A1 +
+   A2 + A3 with explicit roles). Then the output form (PDF / LaTeX /
+   Markdown / HTML).
 3. Create the dossier from `modules/dossier-template.md`: lock the problem
    statement and notation, open the first thread.
 4. Input the rough idea. From then on: draft → panel → high-level check →
@@ -124,6 +132,10 @@ skills/spell/
 - **Everything is versioned.** Every draft, report, and manuscript carries a
   version (`v1`, `v2`, …), and so does every update to the problem statement;
   nothing is cited without its version.
+- **Portable to any agentic system.** Spell is roles, phases, and rules — not
+  a model or a harness — so it layers onto any agentic system and is easy to
+  personalize: swap prompts, add tools, change phases, or reuse the
+  discipline elsewhere.
 - **Nothing is a certificate.** Panel verdicts and high-level checks are
   independent review, not formal proof.
 

@@ -1,12 +1,14 @@
 ---
 name: spell
-description: Run Spell, the adversarial multi-agent prover for mathematical theorem proofs — rough idea in, manuscript out, in bounded runs with user decisions between runs. Use when the user asks to run Spell, prove or review a mathematical theorem, turn a rough idea into a manuscript, run the review panel or high-level check on a draft, or work on an open problem under Spell's protocol.
+description: Run Spell, the adversarial multi-agent proof protocol for mathematical theorems — rough idea in, finer manuscript out, in bounded runs with user decisions between runs. Use when the user asks to run Spell, prove or review a mathematical theorem, turn a rough idea into a manuscript, run the review panel or high-level check on a draft, or work on an open problem under Spell's protocol.
 ---
 
 # Spell — Core
 
-Adversarial multi-agent prover for mathematical theorem proofs. **Contract:**
-rough idea in → manuscript out. **Run envelope:** a variable `RUN_LENGTH`
+Adversarial multi-agent proof protocol for mathematical theorems. **Contract:**
+rough idea in → finer manuscript out. No Lean/Coq verification — the output
+is reviewed prose, never a machine-checked proof.
+**Run envelope:** a variable `RUN_LENGTH`
 chosen at project start, bounding the agent work per run; every run ends
 with a deliverable + a decision list for the user; the dossier carries state
 across runs; the user decides between runs. Never run autonomously across
@@ -14,7 +16,8 @@ days.
 
 ## Vocabulary
 - **draft** — one agent's single-time report, versioned (`v1`, `v2`, …);
-  never delivered.
+  high-level by design — tedious work is delegated to sub-agents, only its
+  outcomes appear; never delivered.
 - **manuscript** — post-panel report; the deliverable (output form chosen at
   project start: PDF / LaTeX / Markdown / HTML); versioned, names the draft
   version it improves on.
@@ -28,12 +31,13 @@ deliverable + decisions. Full detail in the repository's `reference/` folder
 (github.com/zhongganpage/Spell); paste-ready prompts in `./modules/prompts.md`.
 
 ## Project start
-The **very first question** of a project is the exterior reviewer setup:
-`X_PROVIDER` / `X_MODEL` / `X_ACCESS` (`./modules/providers.md` — provider
-API env var or the local Codex CLI; default kimi/k2.7/api). Then the output
-form (PDF / LaTeX / Markdown / HTML), then the dossier. Ask these before any
-work starts; if the user has no exterior reviewer, record `X unavailable —
-reduced diversity` and proceed.
+The **very first question** is a choice: configure the exterior reviewer X
+(`X_PROVIDER` / `X_MODEL` / `X_ACCESS`, `./modules/providers.md` — provider
+API env var or the local Codex CLI; default kimi/k2.7/api), or declare **no
+X** — the panel then runs internal A1 + A2 + A3 with explicit roles. Then the
+output form (PDF / LaTeX / Markdown / HTML), then the dossier. Ask these
+before any work starts; a no-X panel records `X unavailable — reduced
+diversity` and a confidence downgrade.
 
 ## Working loop
 LOAD dossier → ATTACK one toolkit move (`./modules/toolkit.md`) → RECORD
@@ -55,11 +59,20 @@ Never end a session on failure; end on the next action.
 5. **Everything is versioned.** Every draft, report, manuscript, and update
    to the problem statement carries a version (`v1`, `v2`, …); cite the
    version you build on.
+6. **Delegate the tedious; stay high-level.** A massive or tedious task that
+   still leaves distance to the goal → spawn a sub-agent, keep thinking
+   high-level, record its result in the dossier. Draft sub-agents record
+   contradictions honestly; manuscript sub-agents fix contradictions between
+   the panel agents.
+7. **Measure the panel.** Periodic auditor reads the ledgers (ritualism, gate
+   leakage, per-reviewer agreement); canary panels seed known-false claims to
+   measure detection. Record what you find.
 
 ## Review panel — 5 agents, phases A–F
-A1, A2 internal + **X** exterior (variables `X_PROVIDER` / `X_MODEL` /
-`X_ACCESS`; access = provider API env var or the local Codex CLI) + R
-ranking + M manuscript.
+A1 counterexample-hunter + A2 step-validator (internal) + **X** exterior
+independent (variables `X_PROVIDER` / `X_MODEL` / `X_ACCESS`; access =
+provider API env var or the local Codex CLI) — or internal **A3**
+architecture-critic when there is no X + R ranking + M manuscript.
 
 A review → B exchange → C cross-review → D rebuttal → E ranking + close → F
 manuscript (follows the ranking; additions flagged `[new in manuscript]`,

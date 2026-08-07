@@ -17,9 +17,13 @@ attacked, and every attack is itself attacked and rebutted.
 
 The panel consists of **five agents**:
 
-- **Three panel reviewers** — **two internal agents** (A1, A2) and **one
-  exterior agent** (X), the latter provided through an external provider's
-  agent API (a model from a different company than the internal harness).
+- **Three panel reviewers** — **A1** (counterexample hunter), **A2** (step
+  validator), and the **third reviewer** — either the **exterior agent X**
+  (an independent reviewer from a different provider, configured at project
+  start) or, when the user has no X, an internal **A3** (architecture
+  critic). A1 and A2 always carry their explicit jobs; X stays an
+  independent reviewer; when X is unavailable the panel runs A1, A2, A3,
+  each with an explicit job.
 - **One ranking agent** (R) — weighs the record, ranks the ideas, and closes
   the panel (Phase E).
 - **One manuscript agent** (M) — writes the manuscript from the ranking
@@ -40,6 +44,17 @@ Independence rules (non-negotiable):
 5. The three panel reviewers communicate only through written records, in the
    exact sequence of the phases below. R and M each enter once, read the
    record, write their artifact, and close.
+6. **Role diversity is enforced.** A1 is the counterexample hunter, A2 the
+   step validator, and the third slot is X (independent exterior reviewer) or
+   A3 (architecture critic) when there is no X. When X is unavailable, the
+   run records `X unavailable — reduced diversity` and a **confidence
+   downgrade** on the panel row.
+7. **Reviewers read verbatim inputs.** Definitions and cited statements are
+   copied from the dossier's locked sections; any restatement by the author
+   is flagged `[restated]` and may be rejected by a reviewer.
+8. **The author never fills the reviewers' prompts.** The harness assembles
+   each reviewer's input; the author being reviewed has no hand in what the
+   reviewers see.
 
 Each panel agent adopts the working stance: *I am the sharpest reviewer in
 this room; no nuance, gap, or promising idea will escape me.* Criticism must
@@ -121,8 +136,24 @@ phase can read. Nothing that is not recorded may be transmitted.
 
 ### Phase A — Independent review of the draft
 
-Each panel agent reads the draft and writes a **review report** containing,
-in order:
+Each panel agent reads the draft and writes a **review report**. Each
+reviewer leads with its role's mandate before the common report:
+
+- **A1 — counterexample hunter.** Attack the draft's main theorem and every
+  claim on concrete instances: re-run the computations (actual code where
+  feasible, logs attached as written records), test degenerate and edge
+  cases, hunt the smallest counterexample. An "accept" must survive an
+  active hunt.
+- **A2 — step validator.** Check every step: does it follow from the results
+  it cites, do the hypotheses hold at each point of use, do the quantifiers
+  match, is anything silently assumed?
+- **A3 — architecture critic** (no-X panels). Judge the overall shape: is
+  the argument correct in shape, is the structure commensurate with the
+  goal, are the gaps honest (`GAP:` labels)?
+- **X — independent exterior reviewer.** The full review from a model that
+  shares no weights with the internal harness.
+
+Then the common report, in order:
 
 1. **Claims audit** — every theorem, lemma, claim, computation, and
    nonstandard definition the draft relies on, each tagged
@@ -197,23 +228,34 @@ record (draft, reports, cross-judgements, rebuttals). M writes the
 2. **Resolution of every criticism.** Every `gap`/`flaw`/`false` item from
    the records is either repaired in the manuscript, explicitly dismissed
    with the reason, or carried forward as an open item.
-3. **Ranking deviations are visible.** If M disagrees with an item in R's
+3. **Delegation and contradiction repair.** M may spawn sub-agents for
+   tedious work (`protocol.md` §5.1). Its sub-agents do not merely record the
+   contradictions between the panel agents — the review reports,
+   cross-judgements, and rebuttals — they attempt to fix them: verify the
+   disputed claim, repair the gap, or determine which side is right. What
+   cannot be fixed is recorded honestly as an open item with the reason.
+4. **Ranking deviations are visible.** If M disagrees with an item in R's
    ranking, it does not silently drop it: the manuscript flags the
    disagreement `[ranking deviation]` with a reason, so the user can audit.
-4. **Improvement remarks.** A dedicated section, "How this manuscript
+5. **Improvement remarks.** A dedicated section, "How this manuscript
    improves on the initial draft (draft vN)", listing the concrete
    improvements: which gaps were closed, which ideas were promoted, which
    attacks were rebutted.
-5. **Version.** The manuscript carries its own version (`v1`, `v2`, …); the
+6. **Version.** The manuscript carries its own version (`v1`, `v2`, …); the
    panel ledger row records the draft version it was built from and the
    manuscript version it produced.
-6. **Form.** The manuscript is written in the project's chosen output form.
+7. **Form.** The manuscript is written in the project's chosen output form.
 
 ## After the panel
 
 The manuscript is handed to the **high-level check** (`high-level-check.md`).
 It is not yet delivered, and it is not yet "established": its claims enter the
 verification ledger like any other claim.
+
+Before the panel closes, its **insights are routed back into the loop**:
+Phase-A "suggested next attacks" and R's ranking are appended verbatim to the
+dossier's Open Threads, so the best research advice the system generates
+informs the next working-loop session, not only the manuscript agent.
 
 ## Failure modes to watch for
 

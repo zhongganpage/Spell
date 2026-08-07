@@ -5,11 +5,14 @@ file in this directory uses these terms with exactly these meanings.
 
 ## The contract
 
-Spell is an adversarial multi-agent prover. Every run follows one contract:
+Spell is an adversarial multi-agent proof protocol. Every run follows one
+contract:
 
-> **Input:** a rough idea. **Output:** a manuscript.
+> **Input:** a rough idea. **Output:** a finer manuscript.
 
-Nothing else is delivered. Everything between the two is internal machinery.
+Spell does not run Lean/Coq verification: the output is reviewed prose, never
+a machine-checked proof. Nothing else is delivered.
+Everything between the two is internal machinery.
 
 ## The run envelope
 
@@ -46,6 +49,11 @@ Properties of a draft:
 - It is one agent's snapshot — not a consensus, not a final product.
 - A project may produce many drafts; each is produced independently by a
   single agent at a single time, and each carries a version (`v1`, `v2`, …).
+- It is high-level by design: massive or tedious work is delegated to
+  sub-agents and only its outcomes appear in the draft; the details live in
+  the dossier (`protocol.md` §5.1).
+- It carries a short "what was tried and failed" section — the run's dead
+  ends are visible to the panel, not laundered.
 - A draft is never delivered.
 
 ### manuscript
@@ -60,6 +68,9 @@ Properties of a manuscript:
   cross-judgements, and the rebuttals.
 - It must state, in its own remarks, how the current argument improves on the
   initial draft.
+- Its writer may delegate tedious work to sub-agents, which not only record
+  but attempt to fix contradictions between the panel agents
+  (`protocol.md` §5.1).
 - It carries a version (`v1`, `v2`, …) and names the draft version it
   improves on.
 - It inherits the output form chosen at project start.
@@ -84,8 +95,12 @@ reached) — and reached either through the provider's **API** (key in an
 environment variable or secrets store, never in the dossier) or through the
 **local Codex CLI** (`codex exec`; Codex is pre-installed on this machine).
 The provider list and the current default live in `review-panel.md`,
-"The exterior agent (X)". If X is unavailable, the panel runs with the two
-internal agents and records the reduced diversity.
+"The exterior agent (X)". The choice is made at project start, as the very
+first question: the user either configures X or declares no X. If X is
+unavailable — or the user chooses not to configure one — the third reviewer
+slot is filled by an internal agent **A3** and the panel runs A1, A2, A3,
+each with an explicit role, recording the reduced diversity and a confidence
+downgrade.
 
 ### review report
 A written critique produced by one panel agent — of the draft (Phase A) or of
@@ -101,6 +116,17 @@ The ranking agent's ordered assessment of the persuasive, interesting,
 and/or helpful ideas and arguments found in the review record (Phase E). The
 ranking is the blueprint on which the manuscript — written by a separate
 agent — is built.
+
+### sub-agent (delegated task)
+A fresh session the author or manuscript agent spawns to complete one
+precise, tedious task — a computation, a case check, a literature sweep, a
+routine sub-proof — while the delegating agent continues the high-level line.
+The sub-agent receives only the written task and returns only a written
+result, recorded in the dossier as a **delegated task** entry. Draft
+sub-agents report contradictions honestly; manuscript sub-agents additionally
+attempt to fix contradictions between the panel agents. A sub-agent's result
+is evidence, never a verdict: it does not grade the delegating agent's work
+and does not bypass the claims ledger. Full rule: `protocol.md` §5.1.
 
 ### high-level check report
 The verdict produced by the independent high-level check agent on novelty and

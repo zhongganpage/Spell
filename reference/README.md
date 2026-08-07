@@ -1,8 +1,8 @@
-# Spell — An Adversarial Multi-Agent Prover
+# Spell — An Adversarial Multi-Agent Proof Protocol
 
 Spell is a set of working rules for proving mathematical theorems with
 multiple AI agents that distrust each other. You give it a rough idea; it
-returns a manuscript.
+returns a finer manuscript.
 
 > **Input:** a rough idea → **Output:** a manuscript.
 >
@@ -10,14 +10,18 @@ returns a manuscript.
 > start; longer projects span several runs with
 > your decisions in between.
 
+Spell is a proof protocol, not a proof checker: it does not run Lean/Coq
+verification — the output is reviewed prose, never a machine-checked proof.
+
 ## How it works
 
 A single agent works on the problem and writes up its results as a **draft**.
-A **review panel** of three adversarial agents — two internal and one
-**exterior agent** called through another company's agent API — attacks the
-draft, attacks each other's attacks, and rebuts; a **ranking agent** then
-weighs the whole record and ranks its ideas, and a separate **manuscript
-agent** writes the **manuscript** from that ranking. An independent
+A **review panel** of three adversarial agents — A1 (counterexample hunter),
+A2 (step validator), and either an **exterior agent X** from another
+company's agent API or, when there is no X, an internal **A3** (architecture
+critic) — attacks the draft, attacks each other's attacks, and rebuts; a
+**ranking agent** then weighs the whole record and ranks its ideas, and a
+separate **manuscript agent** writes the **manuscript** from that ranking. An independent
 **high-level check** then judges whether the manuscript is novel (against the
 literature) and sufficient (the gaps are reachable). Only a manuscript that
 passes is delivered.
@@ -52,16 +56,17 @@ own homework).
 | `definition.md` | The vocabulary: rough idea, draft, manuscript, progress report, exterior agent, review report, rebuttal, ranking, high-level check. Also fixes the **output form** and the **run envelope** (`RUN_LENGTH`), asked once at project start. |
 | `review-panel.md` | The five-agent panel — 2 internal reviewers + 1 exterior reviewer (external agent API) + 1 ranking agent + 1 manuscript agent; phases A–F. |
 | `high-level-check.md` | The independent novelty/sufficiency gate. |
-| `protocol.md` | The working protocol: dossier, attempts log, transformation toolkit, stuck ladder, anti-give-up rules, verification ledger, startup checklist. |
+| `protocol.md` | The working protocol: dossier, attempts log, transformation toolkit, stuck ladder, anti-give-up rules, delegation of tedious work (drafts stay high-level; manuscript sub-agents fix contradictions), verification ledger, startup checklist. |
 
 ## Starting a project
 
 1. Read `definition.md` and `protocol.md` (especially §10, the startup
    checklist).
-2. **Configure the exterior reviewer — the very first question.** Set the
-   variables `X_PROVIDER`, `X_MODEL`, `X_ACCESS` (provider API key, or the
-   locally installed Codex CLI; keys live in environment variables, never in
-   the dossier).
+2. **Choose the exterior reviewer — the very first question.** Either
+   configure X — `X_PROVIDER`, `X_MODEL`, `X_ACCESS` (provider API key, or
+   the locally installed Codex CLI; keys live in environment variables,
+   never in the dossier) — or declare no X, and the panel runs internal
+   A1 + A2 + A3 with explicit roles.
 3. Tell Spell the **output form** (PDF / LaTeX / Markdown / HTML) — it asks
    once, at the beginning.
 4. Fix the **run envelope** (`RUN_LENGTH`, chosen at project start).
@@ -84,5 +89,9 @@ own homework).
   decision list for you.
 - **Recording is mandatory.** Progress is measured in dossier entries, not
   solutions; dead ends and rejections are data.
+- **Portable to any agentic system.** Spell is roles, phases, and rules — not
+  a model or a harness — so it layers onto any agentic system and is easy to
+  personalize: swap prompts, add tools, change phases, or reuse the
+  discipline elsewhere.
 - **Nothing is a certificate.** Panel verdicts and high-level checks are
   independent review, not formal proof.

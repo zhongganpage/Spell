@@ -53,6 +53,12 @@ and version it judged (e.g. `manuscript v1`).
 
 ### Novelty
 
+Every verdict rests on **fetched sources, not recall**: the literature sweep
+is actually executed (an M11/M12 sub-agent fetches and reads), and every
+literature claim carries a locator (arXiv ID / DOI / page). A `novel` or
+`known` verdict without a fetched, locator-carrying source is unsupported —
+at most `conditional`.
+
 - `novel` — the central idea is not in the literature searched.
 - `extension` — new, but visibly extends a known result; say which.
 - `known` — the result, or an equivalent form, is already in the literature;

@@ -37,13 +37,30 @@ gaps found (non-blocking notes).
 <proof text>
 ```
 
-## 2. Panel reviewer — Phase A (for A1, A2, X)
+## 2. Panel reviewer — Phase A (for A1, A2, X/A3)
 
 ```text
 You are the sharpest reviewer in this room; no nuance, gap, or promising
 idea will escape you. You are one of three independent reviewers of a draft
-for the following problem. Write your review report before seeing the other
-reviewers' reports; do not close after finishing.
+for the following problem. Your role: <A1 — counterexample hunter | A2 —
+step validator | A3 — architecture critic (no-X panels) | X — independent
+exterior reviewer>.
+
+Lead with your role's mandate:
+- A1: attack the main theorem and every claim on concrete instances — re-run
+  computations in actual code where feasible (attach the logs), test
+  degenerate and edge cases, hunt the smallest counterexample. An "accept"
+  must survive an active hunt.
+- A2: check every step — does it follow from the results it cites, do the
+  hypotheses hold at each point of use, do the quantifiers match, is
+  anything silently assumed?
+- A3: judge the overall shape — is the argument correct in shape, is the
+  structure commensurate with the goal, are the gaps honest (GAP:)?
+- X: the full independent review from a model that shares no weights with
+  the internal harness.
+
+Write your review report before seeing the other reviewers' reports; do not
+close after finishing.
 
 Review report, in this order:
 1. Claims audit — every theorem, lemma, claim, computation, and nonstandard
@@ -103,12 +120,17 @@ Write the manuscript from the ranking and the record below. Obligations:
    and subject to verification before use.
 2. Resolution — every gap/flaw/false item from the records is repaired,
    explicitly dismissed with reason, or carried forward as an open item.
-3. Ranking deviations are visible — if you disagree with a ranked item, flag
+3. Contradiction repair — you may spawn sub-agents for tedious work; they do
+   not merely record contradictions between the agents (reports,
+   cross-judgements, rebuttals) but attempt to fix them — verify the disputed
+   claim, repair the gap, or determine which side is right. What cannot be
+   fixed is recorded honestly as an open item.
+4. Ranking deviations are visible — if you disagree with a ranked item, flag
    it [ranking deviation] with a reason; never drop it silently.
-4. Include a section "How this manuscript improves on the initial draft
+5. Include a section "How this manuscript improves on the initial draft
    (draft vN)". Give this manuscript its own version (`v1`, `v2`, …) and name
    it in the header.
-5. Output form: <chosen form>.
+6. Output form: <chosen form>.
 
 --- LOCKED PROBLEM STATEMENT ---
 <problem statement>
@@ -130,7 +152,9 @@ line-by-line). You have not seen how it was derived.
    literature: novel | extension (of what) | known (cite it). Every
    literature claim must carry a verifiable locator (arXiv ID / DOI /
    page); an unverifiable citation is unsupported, and forces at most
-   "conditional".
+   "conditional". Verdicts rest on fetched sources, not recall: a `novel`
+   or `known` verdict without at least one fetched-and-read source with a
+   locator is at most `conditional`.
 2. Sufficiency — are the crucial gaps within reach of known tools | plausible
    but hard | far beyond reach? Does the architecture of the argument
    support the claim if the gaps were filled? Are gaps honestly labelled
@@ -143,4 +167,43 @@ line-by-line). You have not seen how it was derived.
 
 --- LOCKED PROBLEM STATEMENT ---
 <problem statement>
+```
+
+## 6. Formalization attempt (optional, M12 delegation)
+
+```text
+Formalize the accepted claim below in Lean 4 with mathlib: state it, then
+prove it or identify exactly where formalization fails (missing definitions,
+an unprovable step, or false as stated). Output the Lean code, the
+#check/#eval result if you ran it, and a verdict: formalized | not
+formalized (with the reason). Do not invent library names; use only what
+exists or is provable.
+
+--- CLAIM (accepted, from the ledger) ---
+<claim text + proof sketch>
+
+--- DEFINITIONS ---
+<definitions used>
+```
+
+## 7. Auditor
+
+```text
+Read the two ledgers below and compute:
+1. Ritualism — how many Phase-A `gap` tags were later withdrawn or silently
+   downgraded?
+2. Gate leakage — do any `pass` manuscripts carry `rejected` or
+   `counterexample` claims in the ledger?
+3. Per-reviewer agreement — for each role (A1 counterexample hunter, A2 step
+   validator, A3 architecture critic, X exterior), how often did its verdict
+   agree with the final outcome?
+4. Detection — were seeded canary claims (known-false) caught?
+
+Report the numbers and any pattern; suggest standing panel instructions.
+
+--- CLAIMS & VERIFICATION LEDGER ---
+<ledger>
+
+--- PANEL & CHECK LEDGER ---
+<ledger>
 ```

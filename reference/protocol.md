@@ -68,6 +68,12 @@ manuscript, a progress report, or a parked state with a decision list — and
 handed the decision list to the user. Any other exit is a return to the
 working loop or a parked thread in the dossier.
 
+Every delivered manuscript carries a one-page **delivery note**: models per
+role and diversity achieved, checks run and their verdicts, claims still
+`claimed`/`under-review`, computed vs. opined, fetched vs. remembered, and
+formalization status. The note operationalizes "nothing is a certificate" at
+the moment of delivery.
+
 ## 3. The dossier
 
 One living, append-only file per problem: `<project root>/research/
@@ -81,9 +87,10 @@ dossier-<problem>.md`. Sections, in order:
 | **Examples & computations** | Dated table: case, computed value, pattern observed. |
 | **Reformulations & connections** | Numbered forms, each with "useful because…" and a date. |
 | **Literature map** | Sources read: theorem, reference, what it leaves open. |
+| **Knowledge State** | Rewritten-at-session-end living summary: conjectures registry, obstructions register, champion draft pointer, dependency backlinks (§3). |
 | **Attempts log** | Append-only, dated (§4.3). The heart of the protocol. |
-| **Claims & verification ledger** | Every claim's lifecycle (§8). |
-| **Panel & check ledger** | Each draft → manuscript run: panel roles (A1, A2, X, R, M), whether X ran, panel verdict, high-level check verdict, routing. |
+| **Claims & verification ledger** | Every claim's lifecycle (§8), including formalization status. |
+| **Panel & check ledger** | Each draft → manuscript run: panel roles (A1, A2, X/A3, R, M), whether X ran, panel verdict, high-level check verdict, routing. |
 | **Open threads / next steps** | The attack queue. Every entry ends with a concrete next step. |
 
 Rules that make the dossier work: append-only (never rewrite history); dated;
@@ -99,6 +106,17 @@ append-only, never silently rewritten. Ledger rows cite the artifact versions
 they record (e.g. "draft v2"), the panel reviews a specific draft version, a
 manuscript names the draft version it improves on, and anything that builds on
 an artifact names its version.
+
+**The Knowledge State.** At every session end the dossier's Knowledge State
+section is rewritten (the only rewritten section; the archive below it stays
+append-only): a **conjectures registry** (`active` / `supported` / `refuted`
+/ `parked-until <trigger>`), an **obstructions register** (each obstruction
+with the move that created it), the **champion draft pointer** (best current
+artifact + version), and **dependency backlinks** between claims and the
+artifacts that build on them. When a claim hits `counterexample`, its
+dependents are flagged `affected` and re-verified before reuse. The Knowledge
+State keeps the live picture readable even after the archive outgrows a
+context window.
 
 ## 4. The exploration loop
 
@@ -181,6 +199,55 @@ one, is recorded. This is the repertoire that answers "no next move".
   terminology. Find the nearest known theorem and read its proof *fully* —
   adapted, not cited. Check specifically whether the claim (or its negation)
   is already known — this distinguishes "open" from "impossible".
+- **M12 — Delegate.** The next attack is a massive or tedious task, and
+  finishing it still leaves distance to the ultimate goal — a long
+  computation, a mechanical case check, a literature sweep, a routine
+  sub-proof. Do not sink the run into it: spawn a fresh sub-agent with a
+  precise written task, keep thinking high-level while it works, record its
+  result in the dossier. Draft sub-agents record contradictions honestly;
+  manuscript sub-agents fix contradictions between agents. Full rule: §5.1.
+
+### 5.1 Delegating tedious work
+
+When the next attack consists of a massive or tedious task — a long
+computation, a mechanical case check, a literature sweep, a routine sub-proof
+— and completing it still leaves a distance to the ultimate goal, the agent
+in charge **delegates it to a sub-agent** instead of sinking its own run into
+the details:
+
+1. **Spawn a sub-agent.** Open a fresh context/session with a precise,
+   self-contained written task: what to compute, search, or prove; the
+   definitions it may use; the exact deliverable format; and the dossier
+   entry where the result is recorded. Nothing is transmitted except the
+   written task, and nothing comes back except the written result.
+2. **Keep thinking high-level.** The delegating agent does not wait idly: it
+   continues the high-level line — next moves, reformulations, the shape of
+   the artifact — while the sub-agent works, then integrates the result when
+   it arrives.
+3. **Sub-agents never grade, never vote.** A delegated result is evidence
+   recorded in the dossier — it is not a verification verdict and does not
+   bypass the claims ledger (§8). Verification still happens in independent
+   sessions with fresh contexts (§8, §11).
+
+**In drafts (working loop).** The author delegates so the draft stays
+high-level: the draft records the delegation, not the mechanics — what was
+delegated, what came back, and what it implies. The details live in the
+dossier's delegated-task entries (`modules/dossier-template.md`, "Delegated
+tasks"); the draft cites them by reference. If a sub-agent's result shows the
+high-level idea is wrong — a counterexample, a failed case, a violated lemma
+— the draft reports the contradiction honestly: the direction, what the
+detail killed, and what still stands. A draft that hides a delegated
+contradiction is worse than one that reports failure (R3: dead ends that are
+written down are work).
+
+**In manuscripts (Phase F).** The manuscript agent may delegate tedious work
+the same way, and its sub-agents carry an extra mandate: they **not only
+record** the contradictions between the panel agents — the review reports,
+cross-judgements, and rebuttals — they **attempt to fix them**. For each
+contradiction a sub-agent verifies the disputed point, repairs the gap, or
+determines which side is right, and hands the settled version back for the
+manuscript. What cannot be fixed is recorded honestly as an open item, with
+the reason (`review-panel.md`, Phase F).
 
 ## 6. The stuck ladder
 
@@ -260,6 +327,10 @@ claimed → under-review → accepted | rejected | counterexample
   goes back to review.
 - `counterexample` — the claim is false as stated. Fix the statement, or
   record the falsity and move on.
+- `formalized` / `unformalized` — status flags on an `accepted` claim: it was
+  (or was not) delegated (M12) for a Lean 4/mathlib formalization attempt.
+  Formalization is optional — the only path to a machine-checked artifact —
+  and the ledger and the delivery note always record which of the two holds.
 
 **Rules:**
 
@@ -276,10 +347,22 @@ claimed → under-review → accepted | rejected | counterexample
   (R3: dead ends that are written down are work).
 - **Every review round is a ledger row** (date, claim, status, reviewer,
   verdict & reasons, repair targets). History is preserved, never overwritten.
+- **Tiered verification.** Code-verifiable claims get a scripted check (an
+  M12 sub-agent runs the computation) instead of a full review session;
+  claims that only extend accepted claims get delta-only review against the
+  accepted base; `floor`-tagged trial artifacts never enter the review queue.
+- **The panel is measured.** A periodic auditor (every few runs, or on
+  request) reads both ledgers and computes: ritualism (Phase-A `gap` tags
+  later withdrawn), gate leakage (`pass` manuscripts accumulating `rejected`
+  claims), and per-reviewer agreement rates. Canary panels — a seeded
+  known-false claim — measure the detection rate. Results are recorded in
+  the dossier and fed back as standing panel instructions.
 - **Diversity is recorded.** Every panel and review row carries the
-  reviewer's model/backend and whether it was an internal agent or the
-  exterior agent X. If X was unavailable, the row records `X unavailable —
-  reduced diversity` and the manuscript or verdict carries the same mark.
+  reviewer's model/backend, its role (A1 counterexample hunter, A2 step
+  validator, A3 architecture critic, or X exterior), and whether X ran. If X
+  was unavailable — or the user chose no X — the row records `X unavailable
+  — reduced diversity, A1+A2+A3 roles, confidence downgraded`, and the
+  manuscript, verdict, and delivery note carry the same mark.
 
 **In the Spell pipeline.** Individual claims are verified by single
 independent sessions (ready-to-paste reviewer prompt in §11). The manuscript
@@ -307,26 +390,33 @@ never a formal proof, and it never overrides a rejected claim in the ledger.
 - **Do not re-derive locked statements.** The problem statement and notation
   live in one locked place; restating them at session start is for
   drift-checking only.
+- **Sub-agents are delegations, not verdicts.** A spawned sub-agent completes
+  one precise, tedious task and writes its result into the dossier; it does
+  not grade the delegating agent's work (§5.1). Verdicts still come only from
+  independent review sessions (§8, §11).
 
 ## 10. Startup checklist
 
 When a new Spell project begins, in order:
 
-1. **Configure the exterior reviewer — the very first question.** Ask the
-   user for the three variables `X_PROVIDER`, `X_MODEL`, `X_ACCESS`
-   (`review-panel.md`, "The exterior agent (X)"). `X_ACCESS` is `api` (key in
-   an environment variable or secrets store — never in the dossier or any
-   report) or `codex` (the pre-installed Codex CLI, no key needed). Current
-   default: `X_PROVIDER=kimi`, `X_MODEL=k2.7`, `X_ACCESS=api`
-   (`MOONSHOT_API_KEY`). If the configured access is unavailable at panel
-   start, X is unavailable and the run records the reduced diversity (§8).
+1. **Choose the exterior reviewer — the very first question.** Ask the user
+   to choose: (a) **configure X** — the three variables `X_PROVIDER`,
+   `X_MODEL`, `X_ACCESS` (`review-panel.md`, "The exterior agent (X)").
+   `X_ACCESS` is `api` (key in an environment variable or secrets store —
+   never in the dossier or any report) or `codex` (the pre-installed Codex
+   CLI, no key needed). Current default: `X_PROVIDER=kimi`, `X_MODEL=k2.7`,
+   `X_ACCESS=api` (`MOONSHOT_API_KEY`). Or (b) **declare no X** — the panel
+   then runs internal A1 + A2 + A3 with explicit roles. Record the choice in
+   the dossier. If X is chosen but unavailable at panel start, the panel
+   falls back to A1 + A2 + A3 and records `X unavailable — reduced diversity,
+   A1+A2+A3 roles, confidence downgraded` (§8).
 2. **Ask the user the output form** — PDF, LaTeX, Markdown, or HTML — and
    record the answer (`definition.md`, "Output form").
 3. **Fix the run envelope.** `RUN_LENGTH`, chosen at project start. Record it
    in the dossier.
 4. **Create the dossier** (template in §12 below), filling in the locked
-   problem statement (`Q v1`), notation, output form, run envelope, and
-   exterior agent.
+   problem statement (`Q v1`), notation, output form, run envelope, and the
+   exterior-agent choice (X or none).
 5. **Fix the internal record format** (LaTeX for math-heavy projects,
    Markdown otherwise) for panel reports, rebuttals, rankings, and ledger
    entries.
@@ -415,6 +505,21 @@ kept in environment variables or a secrets store, never in this dossier>
 
 | date | source | theorem / claim | hypotheses | gap it leaves |
 
+## Knowledge State (rewritten at session end — the only rewritten section)
+
+**Conjectures registry**
+
+| id | conjecture | status (active/supported/refuted/parked-until) | depends on | last touched |
+
+**Obstructions register**
+
+| id | obstruction | created by (thread, move) | status |
+
+**Champion draft:** <artifact + version>
+
+**Dependency backlinks:** claim → artifacts building on it (a `counterexample`
+flags its dependents `affected`; they are re-verified before reuse).
+
 ## Attempts log
 
 ### <date> — thread <T#>, move <M#>
@@ -423,21 +528,32 @@ broke:   ...
 implies: ...
 next:    ...
 
+## Delegated tasks
+
+| date | task (what was asked) | sub-agent (model/backend) | result / where recorded | implications |
+
 ## Claims & verification ledger
 
-| date | claim | status | reviewer (model) | verdict & reasons | repair targets / notes |
+| date | claim | status | formalized (Y/N) | reviewer (role, model) | verdict & reasons | repair targets / notes |
 
 ## Panel & check ledger
 
-| date | artifact (version) | panel (A1,A2,X,R,M) | panel verdict | high-level check | routing |
+| date | artifact (version) | panel (A1,A2,X/A3,R,M) | panel verdict | high-level check | routing |
 
-> In the panel cell, record which agents actually ran — e.g. `X:ok` or
-> `X:unavailable — reduced diversity` (`protocol.md` §8).
+> In the panel cell, record which agents actually ran and the roles — e.g.
+> `X:ok` or `X:unavailable — A1+A2+A3 roles, confidence downgraded`
+> (`protocol.md` §8).
 
 ## Open threads / next steps
 
 - **T1** <thread description> — state: active — next: <concrete step>
 - **T2** <thread description> — state: stalled <date> — resume: <one line>
+
+## Delivery note (one page, per delivered manuscript)
+
+Models per role and diversity achieved · checks run and verdicts · claims
+still `claimed`/`under-review` · computed vs. opined · fetched vs. remembered
+· formalization status
 ```
 
 Example attempts-log entry:

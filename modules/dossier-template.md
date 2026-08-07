@@ -42,6 +42,21 @@ store, never in this dossier)
 
 | date | source | theorem / claim | hypotheses | gap it leaves |
 
+## Knowledge State (rewritten at session end — the only rewritten section)
+
+**Conjectures registry**
+
+| id | conjecture | status (active/supported/refuted/parked-until) | depends on | last touched |
+
+**Obstructions register**
+
+| id | obstruction | created by (thread, move) | status |
+
+**Champion draft:** <artifact + version>
+
+**Dependency backlinks:** claim → artifacts building on it (a `counterexample`
+flags its dependents `affected`; they are re-verified before reuse).
+
 ## Attempts log
 
 ### <date> — thread <T#>, move <M#>
@@ -50,21 +65,31 @@ broke:   ...
 implies: ...
 next:    ...
 
+## Delegated tasks
+
+| date | task (what was asked) | sub-agent (model/backend) | result / where recorded | implications |
+
 ## Claims & verification ledger
 
-| date | claim | status | reviewer (model) | verdict & reasons | repair targets / notes |
+| date | claim | status | formalized (Y/N) | reviewer (role, model) | verdict & reasons | repair targets / notes |
 
 ## Panel & check ledger
 
-| date | artifact (version) | panel (A1,A2,X,R,M) | panel verdict | high-level check | routing |
+| date | artifact (version) | panel (A1,A2,X/A3,R,M) | panel verdict | high-level check | routing |
 
-> In the panel cell, record which agents actually ran — e.g. `X:ok` or
-> `X:unavailable — reduced diversity`.
+> In the panel cell, record which agents actually ran and the roles — e.g.
+> `X:ok` or `X:unavailable — A1+A2+A3 roles, confidence downgraded`.
 
 ## Open threads / next steps
 
 - **T1** <thread description> — state: active — next: <concrete step>
 - **T2** <thread description> — state: stalled <date> — resume: <one line>
+
+## Delivery note (one page, per delivered manuscript)
+
+Models per role and diversity achieved · checks run and verdicts · claims
+still `claimed`/`under-review` · computed vs. opined · fetched vs. remembered
+· formalization status
 ```
 
 Example attempts-log entry:
