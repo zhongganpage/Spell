@@ -15,11 +15,8 @@ a separate **manuscript agent** writes the **manuscript** from that ranking.
 An independent **high-level check** then judges novelty and sufficiency.
 Only a manuscript that passes is delivered.
 
-Every run is time-boxed to a **run envelope** you set at project start
-(`quick` 30 min · `medium` 60 min · `long` 2 h · `superlong` 4 h; default
-`medium`) and ends with a deliverable (draft,
-manuscript, or progress report) plus a decision list for you — Spell never
-runs autonomously for weeks; the dossier carries the state between runs, and
+Every run ends with a deliverable (draft,
+manuscript, or progress report) plus a decision list for you; the dossier carries the state between runs, and
 you decide between them.
 
 ## How it works
