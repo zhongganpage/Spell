@@ -1,0 +1,6 @@
+# credentials — Spell rules never store these in the repository
+.env
+*.env
+*.pem
+*.key
+!*.pub
