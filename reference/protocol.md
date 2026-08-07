@@ -24,8 +24,9 @@ apply. Documents referenced here: `definition.md`, `review-panel.md`,
 4. **The dossier is the memory.** Nothing an agent knows lives only in a
    previous context window.
 5. **Runs are time-boxed; the user decides between runs.** A run ends with a
-   deliverable and a decision list within the run budget (default 8 hours);
-   Spell never operates autonomously across days or months.
+   deliverable and a decision list within the run budget (`RUN_LENGTH`,
+   default `medium` = 60 min); Spell never operates autonomously across days
+   or months.
 
 ## 2. The pipeline
 
@@ -48,9 +49,11 @@ high-level check ─────────────────────
 deliverable + decision list → user → (next run, if the user continues)
 ```
 
-**The run envelope.** A Spell run is time-boxed: at most **8 hours** of agent
-work per run, after which the run must produce a deliverable and a decision
-list, and control returns to the user. A full rough-idea → manuscript cycle
+**The run envelope.** A Spell run is time-boxed: at most **`RUN_LENGTH`** of
+agent work per run — `quick` 30 min · `medium` 60 min · `long` 2 h ·
+`superlong` 4 h, chosen at project start (default `medium`, 60 min) — after
+which the run must produce a deliverable and a decision list, and control
+returns to the user. A full rough-idea → manuscript cycle
 may span several runs: a run may end (1) after the working loop, with a
 **progress report**; (2) after a draft; (3) after the panel, with a
 **manuscript**; or (4) at the high-level check, with its verdict. Every run
@@ -111,7 +114,7 @@ Before ending, in this order:
 3. Write the next step. If you cannot write one, walk down the Stuck Ladder
    (§6) until you can — creating a next step is part of the work.
 
-When the run budget (default 8 hours) is nearly spent, the run must not start
+When the run budget (`RUN_LENGTH`, default `medium` 60 min) is nearly spent, the run must not start
 new work: it closes the current entry, writes the run's deliverable — a
 draft, a manuscript, or a **progress report** (what was tried, what stands,
 what was ruled out, and the decision list) — and stops.
@@ -298,8 +301,9 @@ When a new Spell project begins, in order:
 
 1. **Ask the user the output form** — PDF, LaTeX, Markdown, or HTML — and
    record the answer (`definition.md`, "Output form").
-2. **Fix the run envelope.** The default is 8 hours of agent work per run;
-   record it in the dossier if it differs.
+2. **Fix the run envelope.** `RUN_LENGTH` — `quick` 30 min · `medium`
+   60 min · `long` 2 h · `superlong` 4 h; default `medium` (60 min). Record it
+   in the dossier.
 3. **Configure the exterior panel agent.** Ask the user for the three
    variables `X_PROVIDER`, `X_MODEL`, `X_ACCESS` (`review-panel.md`,
    "The exterior agent (X)"). `X_ACCESS` is `api` (key in an environment
@@ -373,7 +377,7 @@ by appending.
 
 **Output form:** <PDF | LaTeX | Markdown | HTML — asked at project start>
 
-**Run envelope:** 8 hours per run
+**Run envelope:** RUN_LENGTH=<quick | medium | long | superlong> — 30 min · 60 min · 2 h · 4 h per run (chosen at project start)
 
 **Exterior panel agent:** <provider/model — configured at start; credentials
 kept in environment variables or a secrets store, never in this dossier>

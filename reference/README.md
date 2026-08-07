@@ -6,7 +6,7 @@ returns a manuscript.
 
 > **Input:** a rough idea → **Output:** a manuscript.
 >
-> Each run is time-boxed to 8 hours; longer projects span several runs with
+> Each run is time-boxed to a run envelope set at project start (`RUN_LENGTH`: `quick` 30 min · `medium` 60 min · `long` 2 h · `superlong` 4 h; default `medium`); longer projects span several runs with
 > your decisions in between.
 
 ## How it works
@@ -48,7 +48,7 @@ own homework).
 | File | Role |
 |---|---|
 | `README.md` | This overview. |
-| `definition.md` | The vocabulary: rough idea, draft, manuscript, progress report, exterior agent, review report, rebuttal, ranking, high-level check. Also fixes the **output form** and the **run envelope** (8 h per run), asked once at project start. |
+| `definition.md` | The vocabulary: rough idea, draft, manuscript, progress report, exterior agent, review report, rebuttal, ranking, high-level check. Also fixes the **output form** and the **run envelope** (`RUN_LENGTH` — `quick` 30 min · `medium` 60 min · `long` 2 h · `superlong` 4 h), asked once at project start. |
 | `review-panel.md` | The five-agent panel — 2 internal reviewers + 1 exterior reviewer (external agent API) + 1 ranking agent + 1 manuscript agent; phases A–F. |
 | `high-level-check.md` | The independent novelty/sufficiency gate. |
 | `protocol.md` | The working protocol: dossier, attempts log, transformation toolkit, stuck ladder, anti-give-up rules, verification ledger, startup checklist. |
@@ -59,7 +59,8 @@ own homework).
    checklist).
 2. Tell Spell the **output form** (PDF / LaTeX / Markdown / HTML) — it asks
    once, at the beginning.
-3. Fix the **run envelope** (default 8 hours per run).
+3. Fix the **run envelope** (`RUN_LENGTH`: `quick` 30 min · `medium` 60 min ·
+   `long` 2 h · `superlong` 4 h; default `medium`).
 4. Configure the **exterior panel agent** — set the variables `X_PROVIDER`,
    `X_MODEL`, `X_ACCESS` (provider API key, or the locally installed Codex
    CLI; keys live in environment variables, never in the dossier).
@@ -77,8 +78,10 @@ own homework).
 - **Independence is structural.** Reviewers never see the author's reasoning,
   each runs in a fresh context, and one reviewer (X) comes from a different
   company's model entirely.
-- **Runs are bounded, the user decides.** At most 8 hours of agent work per
-  run; every run ends with a deliverable and a decision list for you.
+- **Runs are bounded, the user decides.** At most `RUN_LENGTH` of agent work
+  per run — `quick` 30 min · `medium` 60 min · `long` 2 h · `superlong` 4 h
+  (chosen at project start); every run ends with a deliverable and a decision
+  list for you.
 - **Recording is mandatory.** Progress is measured in dossier entries, not
   solutions; dead ends and rejections are data.
 - **Nothing is a certificate.** Panel verdicts and high-level checks are

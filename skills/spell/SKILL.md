@@ -1,15 +1,16 @@
 ---
 name: spell
-description: Run Spell, the adversarial multi-agent prover for mathematical theorem proofs — rough idea in, manuscript out, in runs of at most 8 hours with user decisions between runs. Use when the user asks to run Spell, prove or review a mathematical theorem, turn a rough idea into a manuscript, run the review panel or high-level check on a draft, or work on an open problem under Spell's protocol.
+description: Run Spell, the adversarial multi-agent prover for mathematical theorem proofs — rough idea in, manuscript out, in bounded runs (quick 30 min · medium 60 min · long 2 h · superlong 4 h) with user decisions between runs. Use when the user asks to run Spell, prove or review a mathematical theorem, turn a rough idea into a manuscript, run the review panel or high-level check on a draft, or work on an open problem under Spell's protocol.
 ---
 
 # Spell — Core
 
 Adversarial multi-agent prover for mathematical theorem proofs. **Contract:**
-rough idea in → manuscript out. **Run envelope:** ≤ 8 h of agent work per
-run; every run ends with a deliverable + a decision list for the user; the
-dossier carries state across runs; the user decides between runs. Never run
-autonomously across days.
+rough idea in → manuscript out. **Run envelope:** a variable `RUN_LENGTH`
+chosen at project start — `quick` (30 min) · `medium` (60 min) · `long` (2 h)
+· `superlong` (4 h) — of agent work per run; every run ends with a deliverable
++ a decision list for the user; the dossier carries state across runs; the
+user decides between runs. Never run autonomously across days.
 
 ## Vocabulary
 - **draft** — one agent's single-time report; never delivered.

@@ -15,7 +15,7 @@ with a next step.
 
 **Output form:** <PDF | LaTeX | Markdown | HTML — asked at project start>
 
-**Run envelope:** 8 hours per run
+**Run envelope:** RUN_LENGTH=<quick | medium | long | superlong> — 30 min · 60 min · 2 h · 4 h per run (chosen at project start)
 
 **Exterior panel agent:** X_PROVIDER=<provider> · X_MODEL=<model> ·
 X_ACCESS=<api | codex> (credentials in environment variables or a secrets

@@ -1,10 +1,11 @@
 # Spell — Core
 
 Adversarial multi-agent prover for mathematical theorem proofs. **Contract:**
-rough idea in → manuscript out. **Run envelope:** ≤ 8 h of agent work per
-run; every run ends with a deliverable + a decision list for the user; the
-dossier carries state across runs; the user decides between runs. Never run
-autonomously across days.
+rough idea in → manuscript out. **Run envelope:** a variable `RUN_LENGTH`
+chosen at project start — `quick` (30 min) · `medium` (60 min) · `long` (2 h)
+· `superlong` (4 h) — of agent work per run; every run ends with a deliverable
++ a decision list for the user; the dossier carries state across runs; the
+user decides between runs. Never run autonomously across days.
 
 ## Vocabulary
 - **draft** — one agent's single-time report; never delivered.

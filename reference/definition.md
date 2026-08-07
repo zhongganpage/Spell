@@ -13,9 +13,11 @@ Nothing else is delivered. Everything between the two is internal machinery.
 
 ## The run envelope
 
-A Spell run is **time-boxed**: at most **8 hours** of agent work per run,
-after which the run must produce a deliverable and a decision list, and
-control returns to the user. Spell never operates autonomously across days or
+A Spell run is **time-boxed**: at most **`RUN_LENGTH`** of agent work per
+run — `quick` (30 min) · `medium` (60 min) · `long` (2 h) · `superlong`
+(4 h), chosen at project start (default `medium`, 60 min) — after which the
+run must produce a deliverable and a decision list, and control returns to
+the user. Spell never operates autonomously across days or
 months; between runs the user decides — continue, redirect, stop, or a new
 rough idea. The dossier carries the state across runs; each run is one
 decision cycle.
@@ -68,7 +70,7 @@ Properties of a manuscript:
 The deliverable of a run that did not culminate in a draft or manuscript: a
 time-boxed summary of the run — what was tried, what stands, what was ruled
 out — plus a decision list for the user and the next run's recommended focus.
-It is the standard output of an 8-hour run on a long-horizon problem, and it
+It is the standard output of a `long` or `superlong` run on a long-horizon problem, and it
 is delivered like any other run deliverable.
 
 ### exterior agent

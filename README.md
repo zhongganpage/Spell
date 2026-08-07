@@ -2,7 +2,7 @@
 
 Spell is a working protocol for proving mathematical theorems with multiple
 AI agents that **distrust each other**. Feed it a rough idea; it returns a
-manuscript — in runs of at most 8 hours, with you deciding between runs.
+manuscript — in bounded runs (quick 30 min · medium 60 min · long 2 h · superlong 4 h), with you deciding between runs.
 
 > **Input:** a rough idea → **Output:** a manuscript.
 
@@ -15,7 +15,9 @@ a separate **manuscript agent** writes the **manuscript** from that ranking.
 An independent **high-level check** then judges novelty and sufficiency.
 Only a manuscript that passes is delivered.
 
-Every run is time-boxed to **8 hours** and ends with a deliverable (draft,
+Every run is time-boxed to a **run envelope** you set at project start
+(`quick` 30 min · `medium` 60 min · `long` 2 h · `superlong` 4 h; default
+`medium`) and ends with a deliverable (draft,
 manuscript, or progress report) plus a decision list for you — Spell never
 runs autonomously for weeks; the dossier carries the state between runs, and
 you decide between them.
@@ -103,7 +105,8 @@ skills/spell/
 
 1. Load `core.md` (or invoke the `spell` skill).
 2. Answer the startup questions: output form (PDF / LaTeX / Markdown / HTML),
-   run envelope (default 8 h), and the exterior agent (`X_PROVIDER`,
+   run envelope (`RUN_LENGTH`: `quick` 30 min · `medium` 60 min · `long` 2 h ·
+   `superlong` 4 h; default `medium`), and the exterior agent (`X_PROVIDER`,
    `X_MODEL`, `X_ACCESS` — a provider API key or the local Codex CLI).
 3. Create the dossier from `modules/dossier-template.md`: lock the problem
    statement and notation, open the first thread.
@@ -117,8 +120,10 @@ skills/spell/
 - **Independence is structural.** Reviewers never see the author's reasoning,
   each runs in a fresh context, and one reviewer comes from a different
   company's model entirely.
-- **Runs are bounded; the user decides.** At most 8 hours of agent work per
-  run; every run ends with a deliverable and a decision list for you.
+- **Runs are bounded; the user decides.** At most `RUN_LENGTH` of agent work
+  per run — `quick` 30 min · `medium` 60 min · `long` 2 h · `superlong` 4 h
+  (chosen at project start) — every run ends with a deliverable and a decision
+  list for you.
 - **Recording is mandatory.** Progress is measured in dossier entries, not
   solutions; dead ends and rejections are data.
 - **Nothing is a certificate.** Panel verdicts and high-level checks are
