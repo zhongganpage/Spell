@@ -41,26 +41,54 @@ phases A–F) reviews the draft, and the high-level check gates delivery
 (`pass` → deliver; `conditional` / `fail` → back to the working loop).
 
 ```
-rough idea ────────────────┐
-manuscript (input) ────────┤
-   │                       │
-   ▼                       │
-[manuscript input?] ──yes──┤
-   │ no                    │
-   ▼                       │
-working loop ────► draft ──┴──► review panel ──► manuscript (+ change list)
-                                     │
-                                     ▼
-                              streamline (agent S)
-                                     │
-                                     ▼
-                       high-level check (novelty + sufficiency)
-                                     │
-                                     ▼
-                           deliverable + decisions
-                                     │
-                                     ▼
-                              you decide → next run
+rough idea ────────────────► working loop ────► draft ──┐
+                                                        │
+                                                        ▼
+manuscript (input) ─────────────────────────────────► review panel ──► manuscript (+ change list)
+                                                                        │
+                                                                        ▼
+                                                                 streamline (agent S)
+                                                                        │
+                                                                        ▼
+                                                           high-level check (novelty + sufficiency)
+                                                                        │
+                                                                        ▼
+                                                               deliverable + decisions
+                                                                        │
+                                                                        ▼
+                                                                 you decide → next run
+```
+
+**Inside the review panel (normal mode)** — phases A–F, five agents; all run
+in the background, and each phase starts only when its written inputs exist.
+
+```
+draft / input manuscript
+  │
+  ▼
+Phase A — independent review (three reviewers, in parallel)
+  ├── A1 counterexample-hunter ──► review report
+  ├── A2 step-validator ─────────► review report
+  └── X (exterior) or A3 (architecture critic) ──► review report
+  │
+  ▼
+Phase B — exchange: each reviewer reads the other two reports
+  │
+  ▼
+Phase C — cross-review: each judges the other two ──► cross-judgements
+  │
+  ▼
+Phase D — rebuttal: each answers the criticisms of its own report
+  │
+  ▼
+Phase E — R (ranking agent): reads the full record, ranks the ideas,
+          closes the three reviewers
+  │
+  ▼
+Phase F — M (manuscript agent): writes the manuscript + change list
+  │
+  ▼
+streamline (S) ──► high-level check ──► deliverable + decisions
 ```
 
 - **Working loop** — persistence protocol: dossier, attempts log, a Pólya-style
