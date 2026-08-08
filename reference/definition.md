@@ -198,7 +198,9 @@ standalone S phase.
 See **tier** — "fast" is now one of three tiers, not a separate mode. It is
 the per-round speed variant of the review panel, chosen at the start of each
 round. Round 1: one agent A writes the draft, a second agent B attacks it (in
-the background), and A rebuts and writes the manuscript + change list.
+the background — the explicit `run_in_background=true` spawn, never the
+blocking foreground default), and A rebuts and writes the manuscript +
+change list.
 Rounds ≥ 2: A attacks the received manuscript, B attacks A's attack, and A
 rebuts and writes the next manuscript + change list. The round then continues
 with the streamline step (folded into M) and the hygiene linter. Fast mode

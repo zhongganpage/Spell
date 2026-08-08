@@ -82,7 +82,9 @@ manuscript (input) ────────────────────�
 ```
 
 **Inside the review panel (normal tier)** — phases A–F, five agents, with
-the promoter running alongside; all run in the background, and each phase
+the promoter running alongside; all are spawned with the harness's explicit
+background/async mode (`run_in_background=true` in Agent-tool harnesses,
+never the blocking foreground default), and each phase
 starts only when its written inputs exist.
 
 ```
@@ -140,7 +142,9 @@ note enters the record, and Phase E and Phase F read it.
   counterexample-hunter, A2 step-validator, and X — an **exterior agent**
   from a different provider, or an internal A3 architecture-critic when you
   have no X), then ranking, then manuscript, with a fresh-context **promoter**
-  running alongside the panel. All agents run in the background; every
+  running alongside the panel. All agents are spawned in the explicit
+  background/async mode (`run_in_background=true` in Agent-tool harnesses,
+  never the blocking foreground default); every
   manuscript version comes with a **change list** (what changed, why, and
   which changes are important). M writes **surgically** — only the sections
   the record changed, the streamline step folded in — and the **hygiene

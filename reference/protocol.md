@@ -404,12 +404,14 @@ computation, a mechanical case check, a literature sweep, a routine sub-proof
 in charge **delegates it to a sub-agent** instead of sinking its own run into
 the details:
 
-1. **Spawn a sub-agent in the background.** Open a fresh context/session in
-   the background (async/detached mode) with a precise, self-contained
-   written task: what to compute, search, or prove; the definitions it may
-   use; the exact deliverable format; and the dossier entry where the result
-   is recorded. Nothing is transmitted except the written task, and nothing
-   comes back except the written result.
+1. **Spawn a sub-agent in the background — explicitly.** Open a fresh
+   context/session with the harness's explicit background/async spawn — in
+   an `Agent`-tool harness (Kimi Code, Claude Code): `run_in_background=true`
+   — never the blocking foreground default, and hand it a precise,
+   self-contained written task: what to compute, search, or prove; the
+   definitions it may use; the exact deliverable format; and the dossier
+   entry where the result is recorded. Nothing is transmitted except the
+   written task, and nothing comes back except the written result.
 2. **Keep thinking high-level.** The delegating agent does not wait idly: it
    continues the high-level line — next moves, reformulations, the shape of
    the artifact — while the sub-agent works, then integrates the result when
@@ -597,10 +599,14 @@ never a formal proof, and it never overrides a rejected claim in the ledger.
 - **Write as you go.** Record each move immediately after making it. When the
   context window is close to its limit, the attempts-log entry is the
   highest-priority write; then stop cleanly.
-- **Agents run in the background.** Every agent the run spawns — panel
-  reviewers, R, M, sub-agents, the high-level check, the auditor — is
-  launched in the background (async/detached mode) and collected when its
-  written artifact is ready; the orchestrator never blocks on a spawn. Phase
+- **Agents run in the background — explicitly.** Every agent the run spawns —
+  panel reviewers, R, M, sub-agents, the high-level check, the auditor — is
+  launched with the harness's explicit background/async spawn — in an
+  `Agent`-tool harness (Kimi Code, Claude Code): `run_in_background=true`;
+  elsewhere the equivalent async/detached mode — never the blocking
+  foreground default, and collected when its written artifact is ready; the
+  orchestrator never blocks on a spawn: it launches, keeps doing its own
+  high-level work, and integrates the artifact when it arrives. Phase
   order is preserved: a phase starts only when its written inputs exist.
 - **Artifact delivery contract.** Every spawned agent is given an explicit
   output path in its prompt and must (a) write its artifact there and (b)

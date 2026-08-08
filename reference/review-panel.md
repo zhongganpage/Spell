@@ -66,9 +66,11 @@ this room; no nuance, gap, or promising idea will escape me.* Criticism must
 be specific (cite the step, the line, the hypothesis) and constructive (say
 what repair would fix it). "This is wrong" without a reason is not a review.
 
-**All panel agents run in the background.** The harness launches A1, A2, and
-X/A3 in the background and in parallel; R and M are each launched in the
-background in their turn. Each agent's written artifact is collected when it
+**All panel agents run in the background — explicitly.** The harness
+launches A1, A2, and X/A3 with its agent tool's explicit background/async
+spawn — in an `Agent`-tool harness (Kimi Code, Claude Code),
+`run_in_background=true` — and in parallel; R and M are each launched the
+same way in their turn. Each agent's written artifact is collected when it
 is ready, and a phase starts only when its written inputs exist. Each agent
 is spawned with an explicit artifact path and confirms its write in its
 final message; an agent that cannot write (read-only type or write-blocked
@@ -143,8 +145,10 @@ the very first startup question (`protocol.md` §10):
   confidence downgrade. One-line check, non-negotiable; the auto-label and
   the downgrade are recorded in the panel ledger and carried on the
   manuscript.
-- **Orchestration checklist.** A1 + A2 + X are launched in parallel; every
-  artifact's existence is confirmed before the next phase starts; and X's
+- **Orchestration checklist.** A1 + A2 + X are launched in parallel, each
+  with the background/async spawn (`run_in_background=true` in an
+  `Agent`-tool harness); every artifact's existence is confirmed before the
+  next phase starts; and X's
   absence — including "never launched" — is recorded as a ledger event. An
   absent or same-family X is always flagged; there is no silent same-model
   panel.

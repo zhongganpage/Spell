@@ -5,12 +5,16 @@ session (internal agents) or passed to X (`codex exec "<prompt>"` /
 provider API). Attach the inputs listed under each.
 
 **Delivery contract (the orchestrator applies this to every assembled
-prompt).** Add an explicit output path to the prompt, and require the agent
-to write its artifact there and confirm the write in its final message. If
-the agent's environment is read-only or the write fails (a read-only
-sub-agent type, a sandboxed `codex exec`), the agent must instead include
-the complete artifact text in its final message; the orchestrator persists
-it verbatim at the assigned path and marks the record
+prompt).** Spawn the agent with the harness's explicit background/async
+spawn — `run_in_background=true` in an `Agent`-tool harness (Kimi Code,
+Claude Code) — never the blocking foreground default: the agent runs
+hidden, the orchestrator never blocks on it, and the artifact is collected
+when it arrives. Add an explicit output path to the prompt, and require the
+agent to write its artifact there and confirm the write in its final
+message. If the agent's environment is read-only or the write fails (a
+read-only sub-agent type, a sandboxed `codex exec`), the agent must instead
+include the complete artifact text in its final message; the orchestrator
+persists it verbatim at the assigned path and marks the record
 `recovered from agent output`. Verify the file exists before the next phase
 starts (Invariant rule 9; `protocol.md` §9).
 

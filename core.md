@@ -166,11 +166,14 @@ against the manuscript's own tables and the notation lock. Not a reviewer.
    high-level, record its result in the dossier. Draft sub-agents record
    contradictions honestly; manuscript sub-agents fix contradictions between
    the panel agents.
-7. **Agents run in the background.** Every agent Spell spawns — panel
-   reviewers, the promoter, R, M, sub-agents, the high-level check, the
-   auditor — is
-   launched in the background and collected when its written artifact is
-   ready; the orchestrator never blocks on a spawn.
+7. **Agents run in the background — explicitly.** Every agent Spell spawns —
+   panel reviewers, the promoter, R, M, sub-agents, the high-level check,
+   the auditor — is launched with the harness's explicit background/async
+   spawn — in an `Agent`-tool harness (Kimi Code, Claude Code):
+   `run_in_background=true`; elsewhere the equivalent async/detached mode —
+   never the blocking foreground default. The orchestrator never blocks on
+   a spawn: it launches, keeps doing its own high-level work, and collects
+   the written artifact when it is ready.
 8. **Measure the panel.** Each run the auditor reads the ledgers (ritualism,
    gate leakage, per-reviewer agreement, **premature kills** — ideas
    rejected/`fail`ed/parked that later proved right: opinion-kills are a
