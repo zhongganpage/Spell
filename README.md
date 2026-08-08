@@ -45,16 +45,31 @@ manuscript (input) ────────┤
    │ no                    │
    ▼                       │
 working loop ────► draft ──┴──► review panel ──► manuscript (+ change list)
-   ▲                    │                            │               │
-   └────────────────────┴────────────────────────────┴───────────────┘
-                     (fail / conditional → back to the loop)
-                                                          │
-                                                          ▼
-                                                   streamline (agent S)
-                                                          │
-                                                          ▼
-                                                  high-level check (normal mode) → deliverable
-                                                  + decisions → you decide → next run
+   ▲                    │
+   └────────────────────┘        per-round mode, asked at the start of
+        (fail / conditional       each round:
+         → back to the loop)      · normal — 5-agent panel, phases A–F
+                                  · fast — 2-agent A/B attack/rebut loop
+                                     │
+                                     ▼
+                              streamline (agent S)
+                                     │
+                        ┌────────────┴────────────┐
+                        ▼                         ▼
+                   normal mode               fast mode
+                        │                         │
+                        ▼                         │
+             high-level check (novelty +         │
+             sufficiency): pass → deliver;       │
+             conditional / fail → back to        │
+             the working loop                    │
+                        │                         │
+                        └────────────┬────────────┘
+                                     ▼
+                           deliverable + decisions
+                                     │
+                                     ▼
+                              you decide → next run
 ```
 
 - **Working loop** — persistence protocol: dossier, attempts log, a Pólya-style
