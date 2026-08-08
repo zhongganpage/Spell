@@ -1,6 +1,6 @@
 # Spell — An Adversarial Cross-Review Proof Generation Protocol
 
-Spell is a **universal proof enhancement protocol** based on adversarial
+Spell is a **universal protocol that enhances proof generations** based on adversarial
 multi-agent cross-review procedures. You can use it on ANY agentic systems such as
 Claude Code, CodeX, Kimi Code and etc, and you can personalize it in whatever way you want by using these agents.
 
