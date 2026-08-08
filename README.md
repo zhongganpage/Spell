@@ -1,22 +1,22 @@
-# Spell — An Adversarial Multi-Agent Proof Protocol
+# Spell — An Adversarial Multi-Agent Cross-Review Proof Generation Protocol
 
 Spell is a **universal proof enhancement protocol** based on adversarial
-multi-agent review procedures. You can use it on ANY agentic systems such as
+multi-agent cross-review procedures. You can use it on ANY agentic systems such as
 Claude Code, CodeX, Kimi Code and etc, and you can personalize it in whatever way you want by using these agents.
 
 Every round runs in **normal mode**
-(5-agent panel, phases A–F, plus the high-level check) or **fast mode** (a
+(5-agent panel with mutual attacks and rebuttals, phases A–F, plus the high-level check) or **fast mode** (a
 2-agent A/B attack/rebut loop that skips the high-level check). My personal experience is that for
-Kimi Code + Deepseek-v4-flash, it will output a fine manuscript within 2
+Kimi Code + Deepseek-v4-flash, the normal mode will output a fine manuscript within 2
 hours and the cost is less than 1 US dollar. Have fun :)
 
 > **Input:** a rough idea or a manuscript → **Output:** a finer manuscript.
 
 Spell is a **proof protocol**, not a proof checker: it does not run Lean/Coq
 verification — the output is reviewed prose, never a machine-checked proof.
-Although it does not completely prove the theorems for you, it helps you
-materialize the rough ideas properly in the current literature and visualize
-the potential gaps. You can use it for multiple rounds and add new ideas when
+Although it does not completely prove the theorems for you, the cross-review panel will help you
+materialize the rough ideas properly in the current literature, visualize
+the potential gaps and even detect nuance directions. You can use it for multiple rounds and add new ideas when
 needed to deepen your thoughts. 
 
 ## What it is
