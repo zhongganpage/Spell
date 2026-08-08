@@ -2,7 +2,9 @@
 
 Spell is a **universal proof enhancement protocol** based on adversarial
 multi-agent review procedures. You can use it on ANY agentic systems such as
-Claude Code, CodeX, Kimi Code and etc. Every round runs in **normal mode**
+Claude Code, CodeX, Kimi Code and etc, and you can personalize it in whatever way you want by using these agents.
+
+Every round runs in **normal mode**
 (5-agent panel, phases A–F, plus the high-level check) or **fast mode** (a
 2-agent A/B attack/rebut loop that skips the high-level check). My personal experience is that for
 Kimi Code + Deepseek-v4-flash, it will output a fine manuscript within 2
@@ -15,8 +17,7 @@ verification — the output is reviewed prose, never a machine-checked proof.
 Although it does not completely prove the theorems for you, it helps you
 materialize the rough ideas properly in the current literature and visualize
 the potential gaps. You can use it for multiple rounds and add new ideas when
-needed to deepen your thoughts. You can also personalize it easily by using
-agents.
+needed to deepen your thoughts. 
 
 ## What it is
 
