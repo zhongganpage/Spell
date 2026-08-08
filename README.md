@@ -130,8 +130,8 @@ note enters the record, and Phase E and Phase F read it.
   transformation toolkit (compute examples, specialize, reformulate, …), a
   stuck ladder with a minimum-output floor, anti-give-up rules, and delegation
   of tedious work to sub-agents (drafts stay high-level; manuscript sub-agents
-  fix contradictions between agents). Each round opens with a bounded **idea
-  sprint** (≤ 10% of the round budget): 3–5 explorer agents plus a
+  fix contradictions between agents). Each round opens with an **idea
+  sprint** hard-capped at 10 minutes wall-clock: 3–5 explorer agents plus a
   recombination agent propose candidate attacks, each with the cheapest
   discriminating test; all candidates — survivors and discards — enter the
   wild-ideas register with revival triggers. A **manuscript input** skips

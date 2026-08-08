@@ -197,7 +197,9 @@ panel/author agent (§9). No `conditional` verdict ever auto-continues into a
 full new round.
 
 **The idea sprint.** The working loop opens with the **idea sprint**, a
-bounded parallel phase costing **≤ 10% of the round budget**: 3–5
+parallel phase **hard-capped at 10 minutes wall-clock**, enforced by the
+orchestrator (sprint start recorded; collection cut off at the mark; a late
+artifact is discarded and recorded `sprint overrun — discarded`): 3–5
 **explorer agents** (flash models fine) — specialize/edge-case miner,
 reformulation hunter (M5), analogy/transfer agent (reads the obstructions
 register and the literature map; evaluates revival triggers), wildcard —

@@ -295,8 +295,10 @@ against the manuscript's own tables and the notation lock. Not a reviewer —
 it is a linter/script.
 
 ### idea sprint
-A bounded (≤ 10% of the round budget) parallel phase at round start: 3–5
-**explorer agents** — specialize/edge-case miner, reformulation hunter (M5),
+A parallel phase at round start, **hard-capped at 10 minutes wall-clock**
+(measured by the orchestrator from sprint start; collection cut off at the
+mark; late artifacts discarded and recorded `sprint overrun — discarded`):
+3–5 **explorer agents** — specialize/edge-case miner, reformulation hunter (M5),
 analogy/transfer agent (reads the obstructions register and the literature
 map; evaluates revival triggers), wildcard — plus a **recombination agent**
 that pairs unrelated dossier entries (two reformulations; an obstruction + a

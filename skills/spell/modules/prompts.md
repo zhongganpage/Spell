@@ -439,8 +439,10 @@ version" note.
 
 ## 13. Idea sprint — explorer agents (×4, parallel, at round start)
 
-Bounded (≤ 10% of the round budget), parallel sprint at round start; flash
-models are fine. Each explorer returns 3–5 candidate attacks, each with the
+Parallel sprint at round start, **hard-capped at 10 minutes wall-clock** —
+the orchestrator records the sprint start, cuts collection off at the mark,
+and discards late artifacts (`sprint overrun — discarded`). Flash models are
+fine. Each explorer returns 3–5 candidate attacks, each with the
 cheapest discriminating test that would settle it and a revival trigger
 (`re-examine when <event>`). All candidates — survivors and discards —
 enter the wild-ideas register as `speculative`: exempt from the verification

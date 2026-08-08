@@ -125,13 +125,15 @@ stuck ladder → floor (trial proof with `GAP:` labels, or a worked example).
 Never end a session on failure; end on the next action.
 
 ## Idea sprint
-At round start, a bounded (≤ 10% of the round budget) parallel sprint: 3–5
-explorer agents (specialize / reformulation hunter / analogy-transfer — which
-also evaluates revival triggers / wildcard) plus a **recombination agent**
-pairing unrelated dossier entries. Each candidate returns with the cheapest
-discriminating test; survivors and discards alike enter the **wild-ideas
-register** with revival triggers. The sprint feeds the GAP-owner; it does not
-open new target queues.
+At round start, a parallel sprint **hard-capped at 10 minutes wall-clock**:
+3–5 explorer agents (specialize / reformulation hunter / analogy-transfer —
+which also evaluates revival triggers / wildcard) plus a **recombination
+agent** pairing unrelated dossier entries. Each candidate returns with the
+cheapest discriminating test; survivors and discards alike enter the
+**wild-ideas register** with revival triggers. The sprint feeds the
+GAP-owner; it does not open new target queues. The orchestrator records the
+sprint start, cuts artifact collection off at the 10-minute mark, and
+discards any late artifact (recorded `sprint overrun — discarded`).
 
 ## Hygiene linter
 A deterministic mechanical pass (one cheap agent/script), run before any
