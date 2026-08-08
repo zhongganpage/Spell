@@ -6,8 +6,9 @@ progress is recorded, and how a rough idea becomes a manuscript.
 This file synthesizes two source protocols — the *Persistence Protocol for AI
 Agents on Open Mathematical Problems* and the *Independent Verification
 Protocol for AI-Agent Claims* — and adapts them to Spell's pipeline
-(rough idea → draft → review panel → manuscript → high-level check →
-delivery; see `README.md`). Where this file is silent, the source protocols
+(rough idea or manuscript → review panel → manuscript → streamline →
+high-level check → delivery; see `README.md`). Where this file is silent,
+the source protocols
 apply. Documents referenced here: `definition.md`, `review-panel.md`,
 `high-level-check.md`.
 
@@ -27,31 +28,59 @@ apply. Documents referenced here: `definition.md`, `review-panel.md`,
    deliverable and a decision list within the run budget (`RUN_LENGTH`,
    chosen at project start); Spell never operates autonomously across days
    or months.
-6. **Everything is versioned.** Every draft, progress report, manuscript, and
-   update to the problem statement carries a version label (`v1`, `v2`, …).
+6. **Everything is versioned.** Every draft, progress report, manuscript,
+   change list, and update to the problem statement carries a version label
+   (`v1`, `v2`, …).
    Nothing is cited, reviewed, or built upon without naming its version; an
    unversioned artifact is not a valid reference.
 
 ## 2. The pipeline
 
 ```
-rough idea
-   │  (startup: exterior reviewer, output form, run envelope, dossier)
+rough idea / manuscript (input document)
+   │  (startup: exterior reviewer, output form, rounds, run envelope,
+   │   dossier, input → question.md; each round: normal or fast mode)
    ▼
-working loop ───────────────────────────────┐  (exploration, §4–§6)
-   │                                        │
-   ▼ (run may end here: progress report)    │  fail / conditional
-draft (single agent, one time)              │
-   │                                        │
-   ▼                                        │
-review panel → manuscript ──────────────────┤
-   │                                        │
-   ▼                                        │
-high-level check ───────────────────────────┘
+[manuscript input?] ──────────────yes──────────────┐
+   │ no                                            │
+   ▼                                               │
+working loop ────────────────────┐                 │  (exploration, §4–§6)
+   │                             │                 │
+   ▼ (run may end here:          │   fail/conditional
+       progress report)          │                 │
+draft ───────────────────────────┤                 │
+   │                             │                 │
+   ▼                             │                 │
+review panel ◄───────────────────┴─────────────────┘
+   │  (normal: A–F · fast: 2-agent attack/rebut loop;
+   │   every artifact versioned, change list per manuscript)
+   ▼
+manuscript + change list
+   │
+   ▼
+streamline (agent S)
+   │
+   ▼
+high-level check (normal mode only — skipped in fast rounds)
    │
    ▼
 deliverable + decision list → user → (next run, if the user continues)
 ```
+
+**Two input modes.** Spell accepts either a **rough idea** (informal,
+incomplete — goes through the working loop and a draft first) or a
+**manuscript** (a complete document, including a previous round's output —
+enters the review panel directly: no working loop, no draft). The manuscript
+mode shortens each round; new ideas from the user or the loop can still enter
+at any time.
+
+**The input document → question.md.** At round 1 the input document —
+whatever its format (`.tex`, `.md`, `.pdf`, …) — is converted into
+`<project root>/research/question.md`, the canonical statement file; the
+dossier's locked statement (`Q v1`) is derived from it. At the end of every
+round, a dated `Subgoals (round N)` section is appended to question.md: the
+subgoals obtained that round (open threads, ranking suggestions,
+high-level-check targets). The next round opens by reading question.md.
 
 **The run envelope.** A Spell run is time-boxed: at most **`RUN_LENGTH`** of
 agent work per run, chosen at project start — after
@@ -62,6 +91,68 @@ may span several runs: a run may end (1) after the working loop, with a
 **manuscript**; or (4) at the high-level check, with its verdict. Every run
 end is a **user decision point** — continue, redirect, stop, or a new rough
 idea. The dossier carries the state across runs.
+
+**The round count.** At the start of round 1 the user is asked **`ROUNDS`** —
+how many rounds to run, an integer from 1 to 10 (recommended ≤ 10: the
+dossier, question.md, and panel records grow every round, and beyond ~10 the
+accumulated record can exceed the harness's context window). The harness then
+runs up to `ROUNDS` full cycles — each from the current input artifact to the
+next manuscript and its change list — and stops with the deliverable and the
+decision list. The user may extend or interrupt at any point; `ROUNDS` is
+recorded in the dossier's locked section. The round count operates inside the
+run envelope: `RUN_LENGTH` is still enforced at phase boundaries, and if it
+runs out mid-cycle the run closes with a progress report and the remaining
+rounds resume in a later run.
+
+**Round timing.** Every round — normal and fast alike — is timed
+automatically by the orchestrator; the timestamps appear in the run's
+visible flow and in the dossier, and are never reconstructed or backfilled
+after the fact. Checkpoints:
+- **Round start** — before any agent spawns, announce and write `Round N
+  started <ISO 8601 timestamp>` in the dossier.
+- **Phase boundaries** — record and display a timestamp when each phase
+  starts and ends (working loop / draft / panel / manuscript / streamline /
+  high-level check — check is normal-mode only; in normal mode the panel
+  phases A–F are timed as well) in the dossier's Round timing table.
+- **Round end** — compute each phase's elapsed time and the round total
+  from the recorded timestamps, fill the Round timing table, report
+  total + phase breakdown in the round's deliverable and decision list,
+  and **show the round time to the user at the end of the round in every
+  mode**: a visible line in the closing message, e.g. `Round 1: 08:55 →
+  09:09, elapsed ~14 min (draft 1m · attack 3m · manuscript 3m ·
+  streamline 3m · check 4m)` (fast rounds show the same line without the
+  check phase), always including the total and, when available, the phase
+  breakdown.
+
+Timestamps are wall-clock times the orchestrator reads at the moment of the
+event (e.g. it runs `date`), in a fixed format.
+
+**Round mode — normal vs fast.** At the start of every round — round 1
+included — ask the user whether to run the round in **normal mode** (the
+5-agent panel, phases A–F) or **fast mode** (a 2-agent loop instead of the
+panel; `review-panel.md`, "Fast mode"). Record the choice in the dossier
+(`mode: normal | fast` in the panel ledger) before any agent spawns; the
+mode binds the whole round. **In a fast round the 5-agent panel is not run
+at all** — no A1, A2, X/A3, R, or M, no phases A–F; exactly two agents run.
+Round 1: A writes the draft, B attacks it
+in the background, then A rebuts and writes the manuscript + change list.
+Rounds ≥ 2: A attacks the received manuscript, B attacks A's attack, then A
+rebuts and writes the next manuscript + change list. The round still ends
+with the streamline step; **fast mode skips the high-level check** (the
+normal-mode gate) and delivers after streamlining. Fast mode trades review
+independence for speed — the author attacks its own artifact, no exterior
+reviewer, no ranking, no high-level gate — so every fast round is marked
+`fast mode` in the panel ledger and its outputs carry a confidence
+downgrade.
+
+**The streamline step.** Between the manuscript and the high-level check, a
+**streamline agent (S)** — a fresh context, run in the background — reads the
+manuscript and its change list and tries to streamline it: extract the core
+ideas, simplify the proof, cut redundancy, without changing the mathematical
+content (`review-panel.md`, "The streamline step"). S appends its material
+simplifications to the change list (context: streamlining); in normal mode
+the high-level check runs on the streamlined manuscript, and in fast mode
+the round delivers after streamlining (no check).
 
 A run is finished when it has produced its deliverable — a draft, a
 manuscript, a progress report, or a parked state with a decision list — and
@@ -77,12 +168,13 @@ the moment of delivery.
 ## 3. The dossier
 
 One living, append-only file per problem: `<project root>/research/
-dossier-<problem>.md`. Sections, in order:
+dossier-<problem>.md`, beside `<project root>/research/question.md` (the
+canonical statement, §2). Sections, in order:
 
 | Section | Contents |
 |---|---|
 | **Status** | `OPEN — n threads active` · last session date. Never `abandoned`. |
-| **Problem statement (locked)** | Precise statement, all definitions, the **chosen output form** (asked at project start), the **run envelope**, and the **exterior agent** configuration. |
+| **Problem statement (locked)** | Precise statement, all definitions, the **chosen output form** (asked at project start), the **run envelope**, the **round count**, and the **exterior agent** configuration. |
 | **Notation** | One fixed notation block; all entries must use it. |
 | **Examples & computations** | Dated table: case, computed value, pattern observed. |
 | **Reformulations & connections** | Numbered forms, each with "useful because…" and a date. |
@@ -90,7 +182,8 @@ dossier-<problem>.md`. Sections, in order:
 | **Knowledge State** | Rewritten-at-session-end living summary: conjectures registry, obstructions register, champion draft pointer, dependency backlinks (§3). |
 | **Attempts log** | Append-only, dated (§4.3). The heart of the protocol. |
 | **Claims & verification ledger** | Every claim's lifecycle (§8), including formalization status. |
-| **Panel & check ledger** | Each draft → manuscript run: panel roles (A1, A2, X/A3, R, M), whether X ran, panel verdict, high-level check verdict, routing. |
+| **Panel & check ledger** | Each round's run: mode (normal/fast), panel roles (A1, A2, X/A3, R, M — or fast A+B), whether X ran, streamline run (S), panel verdict, high-level check verdict, routing. |
+| **Round timing** | Per-round start/end timestamps and elapsed time, with a phase breakdown. |
 | **Open threads / next steps** | The attack queue. Every entry ends with a concrete next step. |
 
 Rules that make the dossier work: append-only (never rewrite history); dated;
@@ -99,7 +192,8 @@ dossier in full before anything else.
 
 **Artifact versions.** Every draft, progress report, and manuscript carries a
 version (`v1`, `v2`, …), incremented each time a new one is produced; review
-reports, cross-judgements, rebuttals, and rankings are versioned the same way.
+reports, cross-judgements, rebuttals, rankings, and change lists are versioned
+the same way.
 Updates to the locked problem statement are versioned too (`Q v1` → `Q v2`,
 …), each with a dated note of what changed and why — the statement is
 append-only, never silently rewritten. Ledger rows cite the artifact versions
@@ -118,6 +212,23 @@ dependents are flagged `affected` and re-verified before reuse. The Knowledge
 State keeps the live picture readable even after the archive outgrows a
 context window.
 
+**Artifact layout.** Artifacts live in `<project root>/research/`; the dossier
+and question.md stay at the top. Once a kind — drafts, manuscripts, reports
+(progress reports and panel records), or change lists — has **more than 2
+versions**, it moves into its own folder: `research/drafts/`,
+`research/manuscripts/`, `research/reports/`, `research/changelogs/`. All
+existing versions of that kind move into the folder; later versions are
+written directly into it.
+
+**Change lists.** Every manuscript version is accompanied by a **change
+list** (`changelog-vN.md`): what changed vs the previous manuscript version
+(or vs the artifact it improves on, for v1), each change with a one-line
+context (which review finding / ranking item / repair drove it) and an
+importance flag (`high` / `medium` / `low`); the `high` changes are repeated
+at the top as a highlighted "Key changes" list. The change list is written by
+the manuscript agent in Phase F (`review-panel.md`) and its version is
+recorded in the panel ledger row.
+
 ## 4. The exploration loop
 
 Every session — and every hour of a long session — runs this loop:
@@ -131,7 +242,7 @@ Every session — and every hour of a long session — runs this loop:
 ```
 
 ### 4.1 Session start
-1. Read the dossier in full.
+1. Read the dossier and question.md in full.
 2. Restate the problem in your own words and compare with the locked
    statement — this catches definition drift early.
 3. Take the top "next step" written by the previous session. Do not start a
@@ -168,44 +279,8 @@ a bad one and must be completed before the session ends.
 When stuck, run through these moves *mechanically*; each move, even a failed
 one, is recorded. This is the repertoire that answers "no next move".
 
-- **M1 — Compute examples.** Smallest cases by hand or code; build a table;
-  state the pattern as a conjecture (recorded); then hunt the *smallest
-  counterexample* to it.
-- **M2 — Extremes and limits.** Degenerate cases: zero, empty set, identity,
-  trivial group, $n=0$, $p=\infty$, $\varepsilon \to 0$, $n \to \infty$.
-  Extremes expose the mechanism that intermediate cases hide.
-- **M3 — Specialize.** Restrict to a subfamily provable with known tools;
-  prove it completely — its proof usually reveals the general mechanism.
-- **M4 — Generalize.** Strip hypotheses to the minimal setting. The proof
-  often falls out of the cleaner statement.
-- **M5 — Reformulate.** Translate the problem into a different language:
-  fixed-point, optimization, variational, combinatorial, probabilistic,
-  graph-theoretic, or generating-function. Change variables, normalize, take
-  the dual, complement, contrapositive. Every new form is new search fuel.
-- **M6 — Prove partial directions.** The necessary direction; a weaker
-  bound; a restricted class. A half-proved statement with an exact boundary
-  of where the proof stops is a research result in itself.
-- **M7 — Key-lemma hunt.** State the lemma that would solve the problem: "If
-  Lemma X, then the theorem follows." Prove X standalone, or find its
-  counterexample. The bottleneck is usually the whole problem in miniature.
-- **M8 — Extremal principle.** Assume a minimal counterexample / maximal
-  element / worst case and derive a contradiction.
-- **M9 — Induction and monotonicity.** Is there a natural induction step? A
-  monotonicity that makes a limiting argument work?
-- **M10 — Computational experiments.** Brute force over small ranges, random
-  search for counterexamples, symbolic tests (OEIS, a CAS). Experiments
-  inform; they never substitute for a proof.
-- **M11 — Literature triangulation.** For every reformulation, search its
-  terminology. Find the nearest known theorem and read its proof *fully* —
-  adapted, not cited. Check specifically whether the claim (or its negation)
-  is already known — this distinguishes "open" from "impossible".
-- **M12 — Delegate.** The next attack is a massive or tedious task, and
-  finishing it still leaves distance to the ultimate goal — a long
-  computation, a mechanical case check, a literature sweep, a routine
-  sub-proof. Do not sink the run into it: spawn a fresh sub-agent with a
-  precise written task, keep thinking high-level while it works, record its
-  result in the dossier. Draft sub-agents record contradictions honestly;
-  manuscript sub-agents fix contradictions between agents. Full rule: §5.1.
+The moves M1–M12 are defined in `modules/toolkit.md`; the delegation rule
+that M12 invokes is spelled out below (§5.1).
 
 ### 5.1 Delegating tedious work
 
@@ -215,11 +290,12 @@ computation, a mechanical case check, a literature sweep, a routine sub-proof
 in charge **delegates it to a sub-agent** instead of sinking its own run into
 the details:
 
-1. **Spawn a sub-agent.** Open a fresh context/session with a precise,
-   self-contained written task: what to compute, search, or prove; the
-   definitions it may use; the exact deliverable format; and the dossier
-   entry where the result is recorded. Nothing is transmitted except the
-   written task, and nothing comes back except the written result.
+1. **Spawn a sub-agent in the background.** Open a fresh context/session in
+   the background (async/detached mode) with a precise, self-contained
+   written task: what to compute, search, or prove; the definitions it may
+   use; the exact deliverable format; and the dossier entry where the result
+   is recorded. Nothing is transmitted except the written task, and nothing
+   comes back except the written result.
 2. **Keep thinking high-level.** The delegating agent does not wait idly: it
    continues the high-level line — next moves, reformulations, the shape of
    the artifact — while the sub-agent works, then integrates the result when
@@ -252,28 +328,11 @@ the reason (`review-panel.md`, Phase F).
 ## 6. The stuck ladder
 
 A thread is stalled when two consecutive sessions on it produced no progress.
-Escalate down this ladder *in order*; you may not skip a rung:
-
-1. **Untried moves.** Run the toolkit moves you have not yet tried (keep a
-   tick list per thread).
-2. **Re-read the dossier.** There are usually unused threads and
-   half-written entries from earlier sessions.
-3. **New reformulation → new search.** Each new form of the problem is a new
-   set of literature search terms.
-4. **Reduce to a baby case.** Prove a trivial case completely and write it up
-   as if for publication.
-5. **Split the problem.** Prove *any* provable subproblem and record it as a
-   partial result — a durable asset.
-6. **The floor — prove something anyway.** If no next step exists even now,
-   the session must not end empty-handed: produce a **trial proof** (best
-   argument you can write, every gap labelled `GAP:` in the text) or a
-   **proof for a semi-explicit example** (a concrete instance worked through
-   completely). Trivial is fine and encouraged; the point is engagement. A
-   trial proof is not a claim of correctness — record it as
-   draft/`claimed` and let verification judge it.
-7. **Only now:** mark the thread `stalled` — with the reason and a one-line
-   "resume here" — and open a new thread. A stalled thread is a storage
-   state, not a verdict. The problem itself never becomes abandoned.
+Escalate down the ladder in `modules/toolkit.md` ("The stuck ladder") *in
+order*; you may not skip a rung. Only after its final rung may a thread be
+marked `stalled` — with the reason and a one-line "resume here" — and a new
+thread opened. A stalled thread is a storage state, not a verdict; the
+problem itself never becomes abandoned.
 
 ## 7. Anti-give-up rules
 
@@ -359,7 +418,8 @@ claimed → under-review → accepted | rejected | counterexample
   the dossier and fed back as standing panel instructions.
 - **Diversity is recorded.** Every panel and review row carries the
   reviewer's model/backend, its role (A1 counterexample hunter, A2 step
-  validator, A3 architecture critic, or X exterior), and whether X ran. If X
+  validator, A3 architecture critic, X exterior, or fast-mode A/B), and
+  whether X ran. If X
   was unavailable — or the user chose no X — the row records `X unavailable
   — reduced diversity, A1+A2+A3 roles, confidence downgraded`, and the
   manuscript, verdict, and delivery note carry the same mark.
@@ -367,8 +427,9 @@ claimed → under-review → accepted | rejected | counterexample
 **In the Spell pipeline.** Individual claims are verified by single
 independent sessions (ready-to-paste reviewer prompt in §11). The manuscript
 itself is produced by the review panel (`review-panel.md`) — whose three
-reviewers include the exterior agent X when available — and gated by the
-high-level check (`high-level-check.md`). A panel verdict or a high-level
+reviewers include the exterior agent X when available — then streamlined
+(§2) and gated by the high-level check (`high-level-check.md`). A panel
+verdict or a high-level
 check `pass` is independent review — much stronger than self-checking, but
 never a formal proof, and it never overrides a rejected claim in the ledger.
 
@@ -377,6 +438,21 @@ never a formal proof, and it never overrides a rejected claim in the ledger.
 - **Write as you go.** Record each move immediately after making it. When the
   context window is close to its limit, the attempts-log entry is the
   highest-priority write; then stop cleanly.
+- **Agents run in the background.** Every agent the run spawns — panel
+  reviewers, R, M, sub-agents, the high-level check, the auditor — is
+  launched in the background (async/detached mode) and collected when its
+  written artifact is ready; the orchestrator never blocks on a spawn. Phase
+  order is preserved: a phase starts only when its written inputs exist.
+- **Artifact delivery contract.** Every spawned agent is given an explicit
+  output path in its prompt and must (a) write its artifact there and (b)
+  confirm the write in its final message. An agent whose environment cannot
+  write — a read-only sub-agent type, or a sandboxed exterior run
+  (`codex exec` under `sandbox_mode: read-only`, approval `never`) —
+  delivers the complete artifact text in its final message; the orchestrator
+  persists it verbatim at the assigned path, records it as
+  `recovered from agent output`, and verifies the file exists before the
+  next phase starts. Prefer a writable agent type for any agent that must
+  produce an artifact.
 - **Fresh sessions load the dossier.** A new session reads the dossier in
   full and continues the top next step. It does not re-derive notation,
   re-read all the literature, or re-attempt recorded dead ends.
@@ -412,158 +488,45 @@ When a new Spell project begins, in order:
    A1+A2+A3 roles, confidence downgraded` (§8).
 2. **Ask the user the output form** — PDF, LaTeX, Markdown, or HTML — and
    record the answer (`definition.md`, "Output form").
-3. **Fix the run envelope.** `RUN_LENGTH`, chosen at project start. Record it
+3. **Fix the round count.** Ask the user how many rounds to run — `ROUNDS`,
+   an integer 1–10; recommend ≤ 10 (the accumulated record grows each round
+   and can exceed the context window beyond that; `definition.md`,
+   "Rounds"). Record it in the dossier.
+4. **Fix the run envelope.** `RUN_LENGTH`, chosen at project start. Record it
    in the dossier.
-4. **Create the dossier** (template in §12 below), filling in the locked
-   problem statement (`Q v1`), notation, output form, run envelope, and the
-   exterior-agent choice (X or none).
-5. **Fix the internal record format** (LaTeX for math-heavy projects,
+5. **Fix the round mode.** Ask whether round 1 runs in **normal mode** (the
+   5-agent panel, phases A–F) or **fast mode** (the 2-agent loop); record
+   `mode: normal | fast` in the dossier. Re-ask at the start of every later
+   round.
+6. **Create the dossier** (template in §12 below), filling in the locked
+   problem statement (`Q v1`), notation, output form, round count, run
+   envelope, and the exterior-agent choice (X or none).
+7. **Convert the input document into question.md.** Whatever the input is —
+   `.tex`, `.md`, `.pdf`, or any other format — turn it into
+   `<project root>/research/question.md`, the canonical statement from which
+   `Q v1` is locked. If the input is already a manuscript, note in the
+   dossier that the run enters the review panel directly (§2).
+8. **Fix the internal record format** (LaTeX for math-heavy projects,
    Markdown otherwise) for panel reports, rebuttals, rankings, and ledger
    entries.
-6. Open the first thread and write its first next step.
-7. Begin the exploration loop (§4).
+9. Open the first thread and write its first next step.
+10. Begin the exploration loop (§4) — or the review panel directly, in
+    manuscript-input mode.
 
 The first draft is produced only after the dossier exists: the draft is the
 first artifact that leaves the working loop, and it must be able to cite its
-thread and move.
+thread and move. In manuscript-input mode there is no first draft — the first
+artifacts are the panel record and the next manuscript.
 
 ## 11. The reviewer prompt (ready to paste)
 
-For verifying individual claims outside the panel, paste this into a second,
-fresh session with the claim, definitions, cited results, and proof attached:
-
-```text
-Independently review the mathematical claim and proof below. You have not
-seen how the author derived them; do not assume the author's reasoning is
-sound. Judge only what is written.
-
-A. CLAIM — Is the statement precise, complete in its hypotheses,
-   well-defined in its terms, and exactly what it claims to be (not weaker,
-   not a different claim)?
-B. PROOF — Does every step follow from the results it cites, and only from
-   them? Do the cited results' hypotheses hold at each point of use? Is any
-   step silently assuming something unproved? Do the quantifiers match the
-   claim?
-C. BOUNDARY — Check degenerate and edge cases, check the smallest nontrivial
-   case, and hunt for a counterexample to the claim or to a single step.
-
-Verdict, with reasons: accepted | rejected (with specific repair targets) |
-gaps found (non-blocking notes).
-
---- CLAIM (exactly as stated) ---
-<claim text>
-
---- DEFINITIONS (exactly) ---
-<definitions used>
-
---- CITED RESULTS (statements only, not proofs) ---
-<cited results>
-
---- PROOF (exactly as written) ---
-<proof text>
-```
+For verifying individual claims outside the panel, paste the claim-reviewer
+prompt (`modules/prompts.md` §1) into a second, fresh session with the
+claim, definitions, cited results, and proof attached.
 
 ## 12. Template dossier
 
-Copy this file per problem. Fill in the locked section once; the rest grows
-by appending.
-
-```markdown
-# Dossier: <short problem name>
-
-**Status:** OPEN — 0 threads active | **Last session:** <date>
-
-## Problem statement (locked)
-
-<precise statement, all definitions>
-
-**Statement version:** Q v1 (locked <date>) — every update is a new version
-(`Q v2`, …), dated, with a note on what changed and why. Never rewritten.
-
-**Output form:** <PDF | LaTeX | Markdown | HTML — asked at project start>
-
-**Run envelope:** RUN_LENGTH=<value chosen at project start>
-
-**Exterior panel agent:** <provider/model — configured at start; credentials
-kept in environment variables or a secrets store, never in this dossier>
-
-**Internal record format:** <LaTeX | Markdown>
-
-## Notation
-
-- <symbol> : <meaning>
-
-## Examples & computations
-
-| date | case | computed value / observation | pattern? |
-
-## Reformulations & connections
-
-- **R1.** <form of the problem> — useful because <reason> (<date>)
-
-## Literature map
-
-| date | source | theorem / claim | hypotheses | gap it leaves |
-
-## Knowledge State (rewritten at session end — the only rewritten section)
-
-**Conjectures registry**
-
-| id | conjecture | status (active/supported/refuted/parked-until) | depends on | last touched |
-
-**Obstructions register**
-
-| id | obstruction | created by (thread, move) | status |
-
-**Champion draft:** <artifact + version>
-
-**Dependency backlinks:** claim → artifacts building on it (a `counterexample`
-flags its dependents `affected`; they are re-verified before reuse).
-
-## Attempts log
-
-### <date> — thread <T#>, move <M#>
-tried:   ...
-broke:   ...
-implies: ...
-next:    ...
-
-## Delegated tasks
-
-| date | task (what was asked) | sub-agent (model/backend) | result / where recorded | implications |
-
-## Claims & verification ledger
-
-| date | claim | status | formalized (Y/N) | reviewer (role, model) | verdict & reasons | repair targets / notes |
-
-## Panel & check ledger
-
-| date | artifact (version) | panel (A1,A2,X/A3,R,M) | panel verdict | high-level check | routing |
-
-> In the panel cell, record which agents actually ran and the roles — e.g.
-> `X:ok` or `X:unavailable — A1+A2+A3 roles, confidence downgraded`
-> (`protocol.md` §8).
-
-## Open threads / next steps
-
-- **T1** <thread description> — state: active — next: <concrete step>
-- **T2** <thread description> — state: stalled <date> — resume: <one line>
-
-## Delivery note (one page, per delivered manuscript)
-
-Models per role and diversity achieved · checks run and verdicts · claims
-still `claimed`/`under-review` · computed vs. opined · fetched vs. remembered
-· formalization status
-```
-
-Example attempts-log entry:
-
-```markdown
-### 2026-08-06 — thread T1, move M3 (specialize to n = 2)
-tried:   proved the claim for the 2-variable case by explicit expansion.
-broke:   the expansion needs a commutation property that fails for n >= 3.
-implies: the obstruction is noncommutativity, not size — try commuting
-         generators, or a nilpotent family, next.
-next:    state and test the "commuting generators" subcase; search
-         literature for "commutative case <problem name>".
-```
+The canonical dossier template — the locked section, ledgers, round timing,
+and delivery note — and its example attempts-log entry live in
+`modules/dossier-template.md`. Copy it per problem; fill in the locked
+section once; the rest grows by appending.

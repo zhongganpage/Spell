@@ -1,7 +1,8 @@
 # Spell — The Review Panel
 
-The review panel converts a **draft** into a **manuscript** (definitions in
-`definition.md`). It is adversarial by design: every claim in the draft is
+The review panel converts a **draft** — or, in manuscript-input mode, a
+**manuscript** — into the next **manuscript** (definitions in
+`definition.md`). It is adversarial by design: every claim in the input is
 attacked, and every attack is itself attacked and rebutted.
 
 ## Purpose
@@ -61,6 +62,15 @@ this room; no nuance, gap, or promising idea will escape me.* Criticism must
 be specific (cite the step, the line, the hypothesis) and constructive (say
 what repair would fix it). "This is wrong" without a reason is not a review.
 
+**All panel agents run in the background.** The harness launches A1, A2, and
+X/A3 in the background and in parallel; R and M are each launched in the
+background in their turn. Each agent's written artifact is collected when it
+is ready, and a phase starts only when its written inputs exist. Each agent
+is spawned with an explicit artifact path and confirms its write in its
+final message; an agent that cannot write (read-only type or write-blocked
+sandbox) delivers the artifact text in its final message and the
+orchestrator persists it verbatim (`protocol.md` §9).
+
 ### The exterior agent (X)
 
 X is selected by three configuration variables, fixed once at project start —
@@ -85,7 +95,11 @@ the very first startup question (`protocol.md` §10):
     `codex exec "<phase prompt>"` and its reply is captured as the written
     artifact. It authenticates through Codex's own login (`codex login`) or
     `OPENAI_API_KEY`; nothing extra is stored in the dossier, and `X_MODEL`
-    is whatever Codex is configured to use.
+    is whatever Codex is configured to use. **Codex may run in a read-only
+    sandbox** (`sandbox_mode: read-only`, approval `never`) that blocks file
+    writes — then the reply on stdout IS the artifact: capture stdout and
+    persist it at the assigned path, marking the record
+    `recovered from agent output`.
 - **Credentials.** API keys live in environment variables or a secrets store.
   They are never written into the dossier, a report, or any record. If
   `X_ACCESS=api` and the provider's variable is unset, X is unavailable.
@@ -122,21 +136,24 @@ the very first startup question (`protocol.md` §10):
 
 ## Inputs and outputs
 
-- **Input:** one draft of a specific version (e.g. draft v2, plus the
-  definitions and cited results it uses) and the project's locked problem
-  statement (`Q` vN).
-- **Output:** one manuscript of a specific version, plus the full written
-  record — 3 review reports, 3 cross-judgements, 3 rebuttals, 1 ranking —
-  kept in the dossier. All panel artifacts carry versions.
+- **Input:** one artifact of a specific version — normally a draft (e.g.
+  draft v2), but in **manuscript-input mode** a manuscript is accepted
+  directly (a complete document, including a previous round's output); in
+  both cases the definitions and cited results it uses and the project's
+  locked problem statement (`Q` vN) are attached.
+- **Output:** one manuscript of the next version, its **change list**
+  (`changelog-vN.md`), plus the full written record — 3 review reports, 3
+  cross-judgements, 3 rebuttals, 1 ranking — kept in the dossier. All panel
+  artifacts carry versions.
 
 ## The phases
 
 All phases are sequential and written: every artifact is a document the next
 phase can read. Nothing that is not recorded may be transmitted.
 
-### Phase A — Independent review of the draft
+### Phase A — Independent review of the input artifact
 
-Each panel agent reads the draft and writes a **review report**. Each
+Each panel agent reads the input artifact and writes a **review report**. Each
 reviewer leads with its role's mandate before the common report:
 
 - **A1 — counterexample hunter.** Attack the draft's main theorem and every
@@ -215,9 +232,10 @@ separate agent's job (Phase F).
 ### Phase F — The manuscript
 
 A **new agent, the manuscript agent M** (separate from R), enters with fresh
-context and receives the locked problem statement, the ranking, and the full
-record (draft, reports, cross-judgements, rebuttals). M writes the
-**manuscript**, under these obligations:
+context and receives the locked problem statement, the ranking, the full
+record (draft, reports, cross-judgements, rebuttals), and the artifact to
+diff against — the previous manuscript version, or the input artifact for v1.
+M writes the **manuscript**, under these obligations:
 
 1. **Faithfulness.** The ranking is the blueprint: every ranked idea appears
    in its ranked priority, and every mathematical assertion in the manuscript
@@ -238,24 +256,95 @@ record (draft, reports, cross-judgements, rebuttals). M writes the
    ranking, it does not silently drop it: the manuscript flags the
    disagreement `[ranking deviation]` with a reason, so the user can audit.
 5. **Improvement remarks.** A dedicated section, "How this manuscript
-   improves on the initial draft (draft vN)", listing the concrete
-   improvements: which gaps were closed, which ideas were promoted, which
-   attacks were rebutted.
+   improves on the initial artifact (draft vN / input manuscript vM)",
+   listing the concrete improvements: which gaps were closed, which ideas
+   were promoted, which attacks were rebutted.
 6. **Version.** The manuscript carries its own version (`v1`, `v2`, …); the
-   panel ledger row records the draft version it was built from and the
+   panel ledger row records the artifact version it was built from and the
    manuscript version it produced.
 7. **Form.** The manuscript is written in the project's chosen output form.
+8. **Change list.** Alongside the manuscript, M writes `changelog-vN.md` (in
+   the internal record format): every material change vs the previous
+   manuscript version (or vs the artifact this manuscript improves on, for
+   v1), each entry with a one-line context (which review finding / ranking
+   item / repair drove it) and an importance flag (`high` / `medium` /
+   `low`); the `high` changes are repeated at the top as a highlighted "Key
+   changes" list. The change list is a brief audit aid, not a full diff.
 
 ## After the panel
 
-The manuscript is handed to the **high-level check** (`high-level-check.md`).
-It is not yet delivered, and it is not yet "established": its claims enter the
+The manuscript and its change list (`changelog-vN.md`) are handed to the
+**streamline step** (§ below) and then, in normal mode, to the
+**high-level check** (`high-level-check.md`); fast rounds skip the check and
+deliver after streamlining. The panel ledger row records both versions. It
+is not yet delivered, and it is not yet "established": its claims enter the
 verification ledger like any other claim.
 
 Before the panel closes, its **insights are routed back into the loop**:
 Phase-A "suggested next attacks" and R's ranking are appended verbatim to the
 dossier's Open Threads, so the best research advice the system generates
 informs the next working-loop session, not only the manuscript agent.
+
+## The streamline step
+
+A **streamline agent (S)** — a single new agent with fresh context, run in
+the background — sits between the manuscript (Phase F) and the high-level
+check. S receives the manuscript and its change list and tries to
+**streamline** it:
+
+1. **Extract the core ideas.** State the main theorem and the proof skeleton
+   plainly at the top; make the architecture of the argument visible.
+2. **Simplify the proof.** Cut redundancy, shorten arguments, remove
+   digressions and dead ends, reorder for clarity.
+3. **Never change the mathematical content.** No new claims, no weakened
+   hypotheses, no dropped steps, no reordering that breaks the argument. A
+   simplification that would touch substance is flagged `[streamlined —
+   check]` and kept out of the critical path, or left as a suggestion with
+   the original step intact.
+4. **Append to the change list.** Every material simplification is appended
+   to `changelog-vN.md` with context "streamlining" and an importance flag.
+5. **Version.** The streamlined manuscript keeps the version of the
+   manuscript it streamlines; the ledger records `S:ok`. If nothing needs
+   simplifying, S says so and passes the manuscript through unchanged.
+
+In normal mode the high-level check runs on the streamlined manuscript; in
+fast mode the round delivers after streamlining (no check). The streamline
+step is a conservative edit: it improves presentation and focus, never the
+claim.
+
+## Fast mode
+
+At the start of each round the user chooses **normal mode** (the 5-agent
+panel, phases A–F) or **fast mode** — a 2-agent adversarial loop that
+replaces the panel for that round. **In a fast round the 5-agent panel does
+not run at all:** A1, A2, X/A3, R, and M are not spawned and phases A–F do
+not occur; the round's panel work is exactly the two-agent loop below:
+
+- **Round 1.** Agent **A** writes the draft (high-level; tedious work
+  delegated per `protocol.md` §5.1). A **manuscript input** skips the draft —
+  round 1 then proceeds as rounds ≥ 2. Agent **B** attacks the draft in the
+  background while A waits; when B's attack arrives, A rebuts every
+  criticism (accepted / rejected / partially accepted, with reasons) and
+  writes the manuscript + its change list.
+- **Rounds ≥ 2.** The input is the previous manuscript. Agent **A** attacks
+  it — every claim tagged, counterexamples hunted, each criticism cited
+  precisely. Agent **B** attacks A's attack — is each criticism right, wrong,
+  overstated, or missing something? Are A's proposed repairs sound? Then **A
+  rebuts** B's critique of its attack and writes the next manuscript + change
+  list.
+
+The round then continues with the streamline step; **the high-level check
+is skipped in fast mode** (it is the normal-mode gate) and the round
+delivers after streamlining. Versioning, the change list, question.md
+subgoals, and round timing apply unchanged.
+
+**Why it is marked, not certified.** Fast mode trades review independence for
+speed: the author attacks its own artifact, there is no exterior reviewer, no
+ranking agent, and no cross-judgement phase. Every fast round is marked
+`fast mode` in the panel ledger, and the manuscript, verdict, and delivery
+note carry the same mark with a **confidence downgrade** — fast mode is a
+faster, weaker loop, not a silent substitute for the panel. (Ready-to-paste
+prompts: `modules/prompts.md` §9–10.)
 
 ## Failure modes to watch for
 

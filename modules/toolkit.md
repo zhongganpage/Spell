@@ -1,6 +1,6 @@
 # Spell — Toolkit (load when stuck)
 
-## Transformation toolkit (M1–M11)
+## Transformation toolkit (M1–M12)
 
 Run these moves *mechanically*; each move, even a failed one, is recorded.
 

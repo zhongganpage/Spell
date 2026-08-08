@@ -26,7 +26,10 @@ API key.
 - **`codex`** — the locally installed OpenAI Codex CLI: invoke X as
   `codex exec "<phase prompt>"` and capture the reply as the written
   artifact. Authenticates through Codex's own login or `OPENAI_API_KEY`;
-  `X_MODEL` is whatever Codex is configured to use.
+  `X_MODEL` is whatever Codex is configured to use. **Codex may run in a
+  read-only sandbox** (`sandbox_mode: read-only`, approval `never`) that
+  blocks file writes — then stdout is the artifact: persist it at the
+  assigned path and mark the record `recovered from agent output`.
 
 Credentials are never written into the dossier, a report, or any record.
 

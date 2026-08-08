@@ -4,6 +4,16 @@ Load this module when a phase starts. Each prompt is pasted into a fresh
 session (internal agents) or passed to X (`codex exec "<prompt>"` /
 provider API). Attach the inputs listed under each.
 
+**Delivery contract (the orchestrator applies this to every assembled
+prompt).** Add an explicit output path to the prompt, and require the agent
+to write its artifact there and confirm the write in its final message. If
+the agent's environment is read-only or the write fails (a read-only
+sub-agent type, a sandboxed `codex exec`), the agent must instead include
+the complete artifact text in its final message; the orchestrator persists
+it verbatim at the assigned path and marks the record
+`recovered from agent output`. Verify the file exists before the next phase
+starts (Invariant rule 9; `protocol.md` §9).
+
 ## 1. Claim reviewer — verification ledger
 
 ```text
@@ -41,8 +51,9 @@ gaps found (non-blocking notes).
 
 ```text
 You are the sharpest reviewer in this room; no nuance, gap, or promising
-idea will escape you. You are one of three independent reviewers of a draft
-for the following problem. Your role: <A1 — counterexample hunter | A2 —
+idea will escape you. You are one of three independent reviewers of
+the input artifact (a draft, or a manuscript in manuscript-input mode) for
+the following problem. Your role: <A1 — counterexample hunter | A2 —
 step validator | A3 — architecture critic (no-X panels) | X — independent
 exterior reviewer>.
 
@@ -127,10 +138,18 @@ Write the manuscript from the ranking and the record below. Obligations:
    fixed is recorded honestly as an open item.
 4. Ranking deviations are visible — if you disagree with a ranked item, flag
    it [ranking deviation] with a reason; never drop it silently.
-5. Include a section "How this manuscript improves on the initial draft
-   (draft vN)". Give this manuscript its own version (`v1`, `v2`, …) and name
-   it in the header.
+5. Include a section "How this manuscript improves on the initial artifact
+   (draft vN / input manuscript vM)". Give this manuscript its own version
+   (`v1`, `v2`, …) and name it in the header.
 6. Output form: <chosen form>.
+7. Change list — alongside the manuscript, write `changelog-vN.md` (internal
+   record format): every material change vs the previous manuscript version
+   (or vs the input artifact this manuscript improves on, for v1 — see
+   PREVIOUS VERSION below). Each change entry: the change (one line), its
+   context (one line — which review finding / ranking item / repair drove
+   it), and its importance (`high` / `medium` / `low`). Repeat the `high`
+   changes at the top as a highlighted "Key changes" list. A change list is
+   a brief audit aid, not a full diff.
 
 --- LOCKED PROBLEM STATEMENT ---
 <problem statement>
@@ -140,6 +159,9 @@ Write the manuscript from the ranking and the record below. Obligations:
 
 --- FULL RECORD ---
 <draft + reports + cross-judgements + rebuttals>
+
+--- PREVIOUS VERSION (to diff against) ---
+<previous manuscript version, or the input artifact for v1>
 ```
 
 ## 5. High-level check
@@ -206,4 +228,89 @@ Report the numbers and any pattern; suggest standing panel instructions.
 
 --- PANEL & CHECK LEDGER ---
 <ledger>
+```
+
+## 8. Streamline agent — after the manuscript, before the high-level check
+
+```text
+Streamline the manuscript below: extract the core ideas and simplify the
+proof as far as you can. Obligations:
+1. Faithfulness — do not change the mathematical content: no new claims, no
+   weakened hypotheses, no dropped steps, no reordering that breaks the
+   argument.
+2. Streamline — state the main theorem and the proof skeleton plainly at the
+   top; cut redundancy; shorten arguments; remove digressions and dead ends.
+3. Substance is guarded — a simplification that would touch substance is
+   flagged [streamlined — check] and kept out of the critical path, or left
+   as a suggestion with the original step intact.
+4. Appended change list entries — append every material simplification to the
+   change list below, each with context "streamlining" and an importance
+   flag (high / medium / low).
+5. Version — keep the manuscript's version; if nothing needs simplifying, say
+   so and pass the manuscript through unchanged.
+
+--- MANUSCRIPT ---
+<manuscript>
+
+--- CHANGE LIST (append to it) ---
+<changelog-vN.md>
+
+--- LOCKED PROBLEM STATEMENT ---
+<problem statement>
+```
+
+## 9. Fast mode — author-critic A (per round)
+
+```text
+Round <N> of a fast-mode Spell run. You are the author-critic: you attack
+the current artifact and write the improved manuscript.
+
+Round 1: write the draft for the problem below (high-level; delegate tedious
+work; record dead ends). A manuscript input skips the draft — round 1 then
+proceeds as in rounds N >= 2.
+Rounds N >= 2: attack the received manuscript — every theorem, lemma, claim,
+computation, and nonstandard definition, each tagged sound | gap | flaw |
+unjustified | false; hunt concrete counterexamples; cite precisely.
+
+Then receive the attacker B's report, rebut every criticism (accepted /
+rejected / partially accepted, with reasons; a rebuttal must engage the
+criticism, not repeat your position), and write the next manuscript version
++ its change list (vs the previous version; each change with a one-line
+context and an importance flag). Additions beyond the record are flagged
+[new in manuscript].
+
+--- LOCKED PROBLEM STATEMENT ---
+<problem statement>
+
+--- CURRENT ARTIFACT ---
+<draft (round 1) | manuscript vN-1 (rounds >= 2)>
+
+--- ATTACKER B's REPORT (handed to A after B finishes) ---
+<B's attack>
+
+--- PREVIOUS VERSION (to diff against) ---
+<previous manuscript version, or the input artifact for v1>
+```
+
+## 10. Fast mode — attacker B (per round)
+
+```text
+You are the attacker in a fast-mode Spell round. Attack the artifact below
+mercilessly and specifically: concrete counterexamples (re-run computations
+in code where feasible), step-by-step validation, hidden assumptions, edge
+cases, quantifier mismatches, missed simplifications. Cite precisely; be
+constructive — say what repair would fix each problem. Write your attack
+report and close.
+
+Round 1: the artifact is the author's draft.
+Rounds >= 2: the artifact is the author-critic A's attack on the received
+manuscript — judge each criticism: is it right, wrong, overstated, or
+missing something? Are A's proposed repairs sound? Where is A wrong, say so
+and why.
+
+--- ARTIFACT ---
+<draft (round 1) | author A's attack (rounds >= 2)>
+
+--- LOCKED PROBLEM STATEMENT ---
+<problem statement>
 ```

@@ -12,7 +12,12 @@ that is the review panel's adversarial job and the verification ledger's job.
 
 ## When it runs
 
-- **Required** on every manuscript, before delivery.
+- **Required** on every manuscript in **normal mode**, before delivery —
+  after the **streamline step** (`review-panel.md`): the check receives the
+  streamlined manuscript and its change list (the change list records what
+  the streamline agent changed). **Fast mode skips the check** — a fast
+  round delivers after streamlining, with the fast-mode confidence
+  downgrade.
 - **Optional** on an early draft, as a triage check — catching "this is
   already known" or "this cannot possibly work" before expensive panel time
   is spent.
@@ -49,7 +54,11 @@ implemented** — not every detail:
 ## The report
 
 The report is a single page of verdicts and reasons; it names the artifact
-and version it judged (e.g. `manuscript v1`).
+and version it judged (e.g. `manuscript v1`). The check agent must write the
+report to the assigned file and confirm the write in its final message; a
+read-only check agent (or a write-blocked sandbox) delivers the report text
+in its final message and the orchestrator persists it verbatim
+(`protocol.md` §9).
 
 ### Novelty
 

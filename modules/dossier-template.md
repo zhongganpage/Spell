@@ -4,6 +4,13 @@ Copy this file per problem. Fill in the locked section once; the rest grows
 by appending. Rules: append-only, dated, notation-locked, versioned, every
 entry ends with a next step.
 
+Artifacts live in `<project root>/research/`; this dossier and `question.md`
+stay at the top. Once a kind — drafts, manuscripts, reports (incl. panel
+records), or change lists — has **more than 2 versions**, move it into its
+own folder (`research/drafts/`, `research/manuscripts/`,
+`research/reports/`, `research/changelogs/`): all its versions move there,
+new ones are written into the folder.
+
 ```markdown
 # Dossier: <short problem name>
 
@@ -20,11 +27,17 @@ entry ends with a next step.
 
 **Run envelope:** RUN_LENGTH=<value chosen at project start>
 
+**Rounds:** ROUNDS=<n> (decided <date>) — 1–10, recommended ≤ 10
+
 **Exterior panel agent:** X_PROVIDER=<provider> · X_MODEL=<model> ·
 X_ACCESS=<api | codex> (credentials in environment variables or a secrets
 store, never in this dossier)
 
 **Internal record format:** <LaTeX | Markdown>
+
+**question.md:** <path — the canonical statement, converted from the input
+document at project start; dated `Subgoals (round N)` sections appended after
+each round>
 
 ## Notation
 
@@ -75,10 +88,29 @@ next:    ...
 
 ## Panel & check ledger
 
-| date | artifact (version) | panel (A1,A2,X/A3,R,M) | panel verdict | high-level check | routing |
+| date | round | mode (normal/fast) | artifact (version) | changelog (version) | panel (normal: A1,A2,X/A3,R,M · fast: A+B) | panel verdict | high-level check | routing |
 
 > In the panel cell, record which agents actually ran and the roles — e.g.
-> `X:ok` or `X:unavailable — A1+A2+A3 roles, confidence downgraded`.
+> `X:ok` or `X:unavailable — A1+A2+A3 roles, confidence downgraded`. Mark the
+> mode (`normal` / `fast`) and the streamline run (`S:ok`); a fast round
+> carries a confidence downgrade. Fast rounds record the high-level check
+> as `skipped (fast mode)` — the check runs in normal mode only.
+
+## Round timing
+
+The orchestrator writes timestamps **live, not backfilled**, for every
+round in every mode (normal and fast): `Round N started <ISO timestamp>` in
+the dossier before any agent spawns, and a timestamp each time a phase
+starts or ends. At round end it computes the elapsed time per phase and the
+total from those timestamps, fills the table, reports them in the round's
+deliverable + decision list, and **shows the round time to the user at the
+end of the round** (closing message: total + phase breakdown). Fast rounds
+have no check phase.
+
+| round | started | ended | elapsed (total) | phase breakdown (loop / draft / panel / manuscript / streamline / check — check is normal-mode only) |
+
+| 1 (fast) | 2026-08-08T08:55:00+08:00 | 2026-08-08T09:05:00+08:00 | 10 min | draft 1m · attack 3m · manuscript 3m · streamline 3m (no check) |
+| 1 (normal) | 2026-08-08T09:10:00+08:00 | 2026-08-08T09:24:00+08:00 | 14 min | draft 1m · attack 3m · manuscript 3m · streamline 3m · check 4m |
 
 ## Open threads / next steps
 
@@ -89,7 +121,7 @@ next:    ...
 
 Models per role and diversity achieved · checks run and verdicts · claims
 still `claimed`/`under-review` · computed vs. opined · fetched vs. remembered
-· formalization status
+· formalization status · mode (normal/fast) and any confidence downgrade
 ```
 
 Example attempts-log entry:

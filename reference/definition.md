@@ -8,7 +8,7 @@ file in this directory uses these terms with exactly these meanings.
 Spell is an adversarial multi-agent proof protocol. Every run follows one
 contract:
 
-> **Input:** a rough idea. **Output:** a finer manuscript.
+> **Input:** a rough idea or a manuscript. **Output:** a finer manuscript.
 
 Spell does not run Lean/Coq verification: the output is reviewed prose, never
 a machine-checked proof. Nothing else is delivered.
@@ -22,12 +22,27 @@ run must produce a deliverable and a decision list, and control returns to
 the user. Spell never operates autonomously across days or
 months; between runs the user decides — continue, redirect, stop, or a new
 rough idea. The dossier carries the state across runs; each run is one
-decision cycle.
+decision cycle (with `ROUNDS` > 1, one batch of rounds ending in a single
+decision point).
 
 A full rough-idea → manuscript cycle may span several runs. A run may end
 after the working loop (with a **progress report**), after a **draft**, after
 the panel (with a **manuscript**), or at the high-level check (with its
 verdict). Every end is a user decision point.
+
+## Rounds
+
+At the start of round 1 the user is asked **`ROUNDS`** — how many rounds to
+run, an integer from 1 to 10. The recommendation is **≤ 10**: the dossier,
+question.md, and the panel records grow every round, and beyond ~10 the
+accumulated record can exceed the harness's context window. `ROUNDS` is
+recorded in the dossier's locked section. The harness runs up to `ROUNDS`
+full cycles — each from the current input artifact to the next streamlined
+manuscript and its change list — then stops with the deliverable and the
+decision list; the user may extend or interrupt at any point. Each round
+records its start time in the dossier when it begins and reports the elapsed
+time at the end (round timing); at the start of each round the user also
+chooses normal or fast mode.
 
 ## Glossary
 
@@ -58,25 +73,32 @@ Properties of a draft:
 
 ### manuscript
 A report obtained after the **review panel** (`review-panel.md`) has processed
-a draft. The manuscript is the output of Spell — the only artifact that is
-delivered.
+a draft (or, in manuscript-input mode, a previous manuscript). The manuscript
+is the output of Spell — the only artifact that is delivered.
 
 Properties of a manuscript:
 
-- It is produced by the review panel's manuscript agent, faithfully based on
-  the ranking and the full review record: the draft, the review reports, the
-  cross-judgements, and the rebuttals.
+- In normal mode it is produced by the review panel's manuscript agent,
+  faithfully based on the ranking and the full review record: the draft, the
+  review reports, the cross-judgements, and the rebuttals (in fast mode, by
+  the author-critic A after B's attack and its rebuttal).
 - It must state, in its own remarks, how the current argument improves on the
-  initial draft.
+  initial artifact (the draft, or the input manuscript).
 - Its writer may delegate tedious work to sub-agents, which not only record
   but attempt to fix contradictions between the panel agents
   (`protocol.md` §5.1).
-- It carries a version (`v1`, `v2`, …) and names the draft version it
+- It carries a version (`v1`, `v2`, …) and names the artifact version it
   improves on.
 - It inherits the output form chosen at project start.
 - It is still a claim, not a certificate: it passes through the high-level
   check before delivery, and every mathematical claim inside it remains
   subject to the verification ledger (`protocol.md` §8).
+
+A manuscript may also be Spell's **input**: when the user submits a complete
+document — including a previous round's output — the panel runs on it
+directly (no working loop, no draft) and produces the next manuscript
+version. Every manuscript version is accompanied by a **change list**
+(§ "change list").
 
 ### progress report
 The deliverable of a run that did not culminate in a draft or manuscript: a
@@ -85,6 +107,54 @@ out — plus a decision list for the user and the next run's recommended focus.
 It is the standard output of a run on a long-horizon problem, and it
 is delivered like any other run deliverable. It carries a version (`v1`,
 `v2`, …) like every other deliverable.
+
+### change list
+The artifact accompanying every manuscript version: what changed vs the
+previous manuscript version (or vs the artifact the manuscript improves on,
+for v1), each change with a one-line context — which review finding, ranking
+item, or repair drove it — and an importance flag (`high` / `medium` /
+`low`). The `high` changes are repeated at the top as a highlighted "Key
+changes" list. Written by the manuscript agent in Phase F
+(`review-panel.md`), in the internal record format, and versioned like every
+other artifact (`changelog-vN.md`).
+
+### question.md
+The canonical statement file: the input document — any format (`.tex`,
+`.md`, `.pdf`, …) — converted into `<project root>/research/question.md` at
+round 1. The dossier's locked statement (`Q v1`) is derived from it. A dated
+`Subgoals (round N)` section is appended after each round, listing the
+subgoals obtained that round (open threads, ranking suggestions,
+high-level-check targets); the next round opens by reading it.
+
+### round
+One full cycle from the current input artifact to the next delivered
+manuscript: rough-idea rounds run the working loop → draft first;
+manuscript-input rounds start at the review panel; every round ends with
+manuscript (+ change list) → streamline → high-level check. The round count
+`ROUNDS` (1–10, recommended ≤ 10) is chosen at the start of round 1 and
+recorded in the dossier's locked section; each round appends its subgoals to
+question.md, records its start time, and reports its elapsed time at the end.
+
+### streamline agent
+The post-panel agent (S) that reads the finished manuscript and tries to
+streamline it: extract the core ideas, simplify the proof, cut redundancy —
+without changing the mathematical content. Simplifications that would touch
+substance are flagged `[streamlined — check]` or left as suggestions with
+the original step intact. S appends its material changes to the manuscript's
+change list (context: streamlining), and the high-level check runs on the
+streamlined manuscript.
+
+### fast mode
+A per-round speed variant of the review panel, chosen by the user at the
+start of each round. Round 1: one agent A writes the draft, a second agent B
+attacks it (in the background), and A rebuts and writes the manuscript +
+change list. Rounds ≥ 2: A attacks the received manuscript, B attacks A's
+attack, and A rebuts and writes the next manuscript + change list. The round
+then continues with the streamline step and the high-level check. Fast mode
+trades review independence for speed — the author attacks its own artifact,
+and there is no exterior reviewer and no ranking — so every fast round is
+marked `fast mode` in the ledger and its outputs carry a confidence
+downgrade.
 
 ### exterior agent
 A review-panel reviewer from a different provider than the internal harness.
@@ -148,8 +218,9 @@ never converted to the output form unless the user asks.
 
 ## Rules of use
 
-1. A "draft" is never delivered; a "manuscript" is never produced by a single
-   agent alone.
+1. A "draft" is never delivered; in normal mode a "manuscript" is never
+   produced by a single agent alone (fast mode's 2-agent loop is the
+   documented exception).
 2. The words "draft" and "manuscript" are used with exactly these meanings
    everywhere in the project — including logs, ledger entries, and file names.
 3. If a manuscript fails the high-level check and re-enters the working loop,
@@ -158,6 +229,14 @@ never converted to the output form unless the user asks.
    reason, are recorded as a dated ledger event.
 4. A run respects its envelope: it ends with a deliverable and a decision
    list within the run budget, and it never continues autonomously beyond it.
-5. Every artifact — draft, report, manuscript, ranking, and any update to the
-   problem statement — carries a version (`v1`, `v2`, …); artifacts cite the
-   versions they build on or replace.
+5. Every artifact — draft, report, manuscript, ranking, change list, and any
+   update to the problem statement — carries a version (`v1`, `v2`, …);
+   artifacts cite the versions they build on or replace.
+6. Every manuscript version is accompanied by a **change list**
+   (`changelog-vN.md`, § "change list"); a delivered manuscript names its
+   change list version.
+7. Artifacts live under `<project root>/research/`. Once a kind — drafts,
+   manuscripts, reports, or change lists — has **more than 2 versions**, it
+   moves into its own folder (`research/drafts/`, `research/manuscripts/`,
+   `research/reports/`, `research/changelogs/`); the dossier and question.md
+   stay at the top.
