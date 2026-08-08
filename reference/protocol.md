@@ -6,8 +6,9 @@ progress is recorded, and how a rough idea becomes a manuscript.
 This file synthesizes two source protocols — the *Persistence Protocol for AI
 Agents on Open Mathematical Problems* and the *Independent Verification
 Protocol for AI-Agent Claims* — and adapts them to Spell's pipeline
-(rough idea or manuscript → review panel → manuscript → streamline →
-high-level check → delivery; see `README.md`). Where this file is silent,
+(rough idea or manuscript → idea sprint → tiered review → surgical
+manuscript (streamline folded into M) → high-level check → delivery; see
+`README.md`). Where this file is silent,
 the source protocols
 apply. Documents referenced here: `definition.md`, `review-panel.md`,
 `high-level-check.md`.
@@ -33,36 +34,62 @@ apply. Documents referenced here: `definition.md`, `review-panel.md`,
    (`v1`, `v2`, …).
    Nothing is cited, reviewed, or built upon without naming its version; an
    unversioned artifact is not a valid reference.
+7. **Opinions rank; only demonstrated counterexamples kill.** "Known",
+   "beyond reach", "misdirected" are opinions — they may demote and attach
+   revival triggers, never terminate. The user may always park a thread by
+   their own decision; the no-kill rule binds the protocol's mechanisms, not
+   the user.
+8. **Deterministic checks beat model checks for mechanical error classes.**
+   Units, citations, brackets, numerical exact-case reproductions are
+   linter/script territory, not reviewer territory.
+9. **Round type selects pipeline weight.** A screening round, a negative
+   round, a repair round, and a manuscript-bound round do not all run the
+   5-agent panel.
+10. **The loop must converge monotonically.** Artifact size non-growing,
+    open-condition count non-increasing, per-claim verification depth
+    non-decreasing. Violation of any of the three is a protocol alarm.
+11. **The user steers at verdicts.** `conditional` / `fail` /
+    negative-outcome routing is a user decision point (repair / park /
+    re-scope), never an automatic continue.
+12. **Budget is conserved.** The savings from tier selection fund the new
+    phases (sprint, linter, promoter, negative-value assessment); total
+    per-round agent budget does not grow.
 
 ## 2. The pipeline
 
 ```
 rough idea / manuscript (input document)
    │  (startup: exterior reviewer, output form, rounds, run envelope,
-   │   dossier, input → question.md; each round: normal or fast mode)
+   │   dossier, input → question.md; per round: idea sprint, then a tier
+   │   proposed from the round type — screening | fast | normal)
    ▼
 [manuscript input?] ──────────────yes──────────────┐
    │ no                                            │
    ▼                                               │
-working loop ────────────────────┐                 │  (exploration, §4–§6)
+working loop (+ idea sprint) ────┐                 │  (exploration, §4–§6)
    │                             │                 │
-   ▼ (run may end here:          │   fail/conditional
-       progress report)          │                 │
-draft ───────────────────────────┤                 │
-   │                             │                 │
+   ▼ (run may end here:          │   conditional:  │
+       progress report)          │   user decides  │
+draft ───────────────────────────┤   repair / park │
+   │                             │   / re-scope    │
    ▼                             │                 │
-review panel ◄───────────────────┴─────────────────┘
-   │  (normal: A–F · fast: 2-agent attack/rebut loop;
-   │   every artifact versioned, change list per manuscript)
+hygiene linter ◄─────────────────┴─────────────────┘
+   │  (deterministic; before any review phase and before
+   │   delivery, all tiers)
    ▼
-manuscript + change list
+tier (from the round type; user may override; recorded, binds the round)
+   │  screening: claim-reviewer format on claims nominated for
+   │             verification; no manuscript
+   │  fast:      2-agent A/B loop; confidence downgrade
+   │  normal:    5-agent panel A–F + promoter
+   ▼
+manuscript + change list (surgical; streamline folded into M)
    │
    ▼
-streamline (agent S)
-   │
-   ▼
-high-level check (normal mode only — skipped in fast rounds)
-   │
+high-level check (normal mode only — skipped in fast rounds; on negative
+   │   rounds replaced by the negative-value assessment, which runs in every
+   │   tier; non-terminal routing — fail/misdirected demote + revival
+   │   triggers, never auto-park)
    ▼
 deliverable + decision list → user → (next run, if the user continues)
 ```
@@ -88,7 +115,9 @@ which the run must produce a deliverable and a decision list, and control
 returns to the user. A full rough-idea → manuscript cycle
 may span several runs: a run may end (1) after the working loop, with a
 **progress report**; (2) after a draft; (3) after the panel, with a
-**manuscript**; or (4) at the high-level check, with its verdict. Every run
+**manuscript**; (4) at the high-level check, with its verdict; or (5) after
+a negative round, with a **negative-value assessment** (§2, "Negative
+rounds"). Every run
 end is a **user decision point** — continue, redirect, stop, or a new rough
 idea. The dossier carries the state across runs.
 
@@ -104,58 +133,116 @@ run envelope: `RUN_LENGTH` is still enforced at phase boundaries, and if it
 runs out mid-cycle the run closes with a progress report and the remaining
 rounds resume in a later run.
 
-**Round timing.** Every round — normal and fast alike — is timed
+**Round timing.** Every round — in every tier — is timed
 automatically by the orchestrator; the timestamps appear in the run's
 visible flow and in the dossier, and are never reconstructed or backfilled
 after the fact. Checkpoints:
 - **Round start** — before any agent spawns, announce and write `Round N
   started <ISO 8601 timestamp>` in the dossier.
 - **Phase boundaries** — record and display a timestamp when each phase
-  starts and ends (working loop / draft / panel / manuscript / streamline /
-  high-level check — check is normal-mode only; in normal mode the panel
-  phases A–F are timed as well) in the dossier's Round timing table.
+  starts and ends (working loop / idea sprint / draft / hygiene linter /
+  panel / manuscript / high-level check — check is normal-mode only; on
+  negative rounds it is replaced by the negative-value assessment; in
+  normal mode the panel phases A–F are timed as well) in the dossier's
+  Round timing table.
 - **Round end** — compute each phase's elapsed time and the round total
   from the recorded timestamps, fill the Round timing table, report
   total + phase breakdown in the round's deliverable and decision list,
   and **show the round time to the user at the end of the round in every
-  mode**: a visible line in the closing message, e.g. `Round 1: 08:55 →
-  09:09, elapsed ~14 min (draft 1m · attack 3m · manuscript 3m ·
-  streamline 3m · check 4m)` (fast rounds show the same line without the
+  tier**: a visible line in the closing message, e.g. `Round 1: 08:55 →
+  09:09, elapsed ~14 min (draft 2m · attack 4m · manuscript 5m ·
+  linter 1m · check 2m)` (fast rounds show the same line without the
   check phase), always including the total and, when available, the phase
   breakdown.
 
 Timestamps are wall-clock times the orchestrator reads at the moment of the
 event (e.g. it runs `date`), in a fixed format.
 
-**Round mode — normal vs fast.** At the start of every round — round 1
-included — ask the user whether to run the round in **normal mode** (the
-5-agent panel, phases A–F) or **fast mode** (a 2-agent loop instead of the
-panel; `review-panel.md`, "Fast mode"). Record the choice in the dossier
-(`mode: normal | fast` in the panel ledger) before any agent spawns; the
-mode binds the whole round. **In a fast round the 5-agent panel is not run
-at all** — no A1, A2, X/A3, R, or M, no phases A–F; exactly two agents run.
-Round 1: A writes the draft, B attacks it
-in the background, then A rebuts and writes the manuscript + change list.
-Rounds ≥ 2: A attacks the received manuscript, B attacks A's attack, then A
-rebuts and writes the next manuscript + change list. The round still ends
-with the streamline step; **fast mode skips the high-level check** (the
-normal-mode gate) and delivers after streamlining. Fast mode trades review
-independence for speed — the author attacks its own artifact, no exterior
-reviewer, no ranking, no high-level gate — so every fast round is marked
-`fast mode` in the panel ledger and its outputs carry a confidence
-downgrade.
+**Round type and tier.** Every round has a **round type** — what it is for —
+and the type selects the **tier**, the pipeline weight, before any agent
+spawns. Types: `exploratory` (open attack on an idea or thread), `negative`
+(rule-out assessment), `repair-scoped` (fixes only the listed conditions of
+a conditional verdict), `manuscript-bound` (produces/delivers a manuscript).
+Default tier per type: exploratory → **screening**; negative → **fast**;
+repair-scoped → the **cheapest tier that can check the listed conditions**
+(normal only when a listed condition is load-bearing); manuscript-bound →
+**normal**. The orchestrator proposes a tier from the round type at round
+start; the user may override; the choice is recorded in the dossier before
+any agent spawns and binds the whole round.
 
-**The streamline step.** Between the manuscript and the high-level check, a
-**streamline agent (S)** — a fresh context, run in the background — reads the
-manuscript and its change list and tries to streamline it: extract the core
-ideas, simplify the proof, cut redundancy, without changing the mathematical
-content (`review-panel.md`, "The streamline step"). S appends its material
-simplifications to the change list (context: streamlining); in normal mode
-the high-level check runs on the streamlined manuscript, and in fast mode
-the round delivers after streamlining (no check).
+- **screening** — the claim-reviewer format (`modules/prompts.md` §1) on
+  every claim nominated for the verification pipeline (§8); no panel, no
+  manuscript.
+- **fast** — the 2-agent A/B attack/rebut loop instead of the panel; no
+  exterior reviewer, no ranking, no high-level check. Round 1: A writes the
+  draft, B attacks it in the background, then A rebuts and writes the
+  manuscript + change list. Rounds ≥ 2: A attacks the received manuscript,
+  B attacks A's attack, then A rebuts and writes the next manuscript +
+  change list. The round ends with the hygiene linter; the streamline step
+  is folded into M. Fast mode trades review independence for speed — the
+  author attacks its own artifact — so every fast round is marked
+  `fast mode` in the panel ledger and its outputs carry a confidence
+  downgrade.
+- **normal** — the 5-agent panel (phases A–F), with the **promoter**
+  alongside (`review-panel.md`, "The promoter"); required only for
+  load-bearing or manuscript-bound claims.
+
+**Repair-scoped rounds.** A `conditional` verdict is always a user decision
+point: **repair** (scope frozen — fix the listed conditions only, no new
+conjectures, re-check only those at the end; the artifact is *not*
+re-derived), **park** (a user decision, never automatic; fragments + revival
+triggers recorded), or **re-scope**. Repair rounds run the cheapest tier
+that can check the listed conditions; the repair agent **resumes** the
+panel/author agent (§9). No `conditional` verdict ever auto-continues into a
+full new round.
+
+**The idea sprint.** The working loop opens with the **idea sprint**, a
+bounded parallel phase costing **≤ 10% of the round budget**: 3–5
+**explorer agents** (flash models fine) — specialize/edge-case miner,
+reformulation hunter (M5), analogy/transfer agent (reads the obstructions
+register and the literature map; evaluates revival triggers), wildcard —
+plus a **recombination agent** pairing unrelated dossier entries (two
+reformulations; an obstruction + a partial result; an idea + a technique
+that worked elsewhere). Each candidate returns with the *cheapest
+discriminating test*. The sprint **feeds the GAP-owner; it does not open new
+target queues**. All candidates — survivors and discards — enter the
+**wild-ideas register** with revival triggers (§3), which is capped at
+**≤ 15 active** wild ideas; the rest are archived and re-checked only when a
+trigger fires or the idea-yield ranking promotes them.
+
+**The hygiene linter.** A **deterministic** mechanical pass by one cheap
+agent/script, run **before any review phase and before delivery in all
+tiers**: (1) every displayed equation checked for dimensional/normalization
+consistency (factor-2, brackets, per-edge vs per-volume, tilt factors);
+(2) every citation checked against fetched records (locators present, not
+corrupted); (3) every bracket/range/constant checked against the
+manuscript's own tables and the notation lock. It is a linter/script, not a
+reviewer: nothing it flags is a verdict, but nothing reaches a review phase
+or delivery before it has run.
+
+**Negative rounds.** A negative round's deliverable is a
+**negative-value assessment** — did we truly rule out a direction, with
+evidence (exact cases, fetched literature, certified computation), or did
+the tool just fail? It is produced by a **dedicated cheap agent that runs
+in all tiers**; it **replaces** the high-level check for negative outcomes
+(it is not a form of it), and it **assesses**, never certifies, the evidence
+quality of the rule-out. Verdicts: `ruled-out-with-evidence` |
+`tool-failure`. A rule-out with assessed evidence is a first-class
+deliverable, recorded in the wild-ideas register under the fragments rule
+(§3).
+
+**Surgical manuscript.** M patches only the sections the record changed
+(diff-scoped) instead of rewriting the full document; the streamline step
+folds into M in the same pass — there is no standalone S — with
+simplifications that would touch substance flagged `[streamlined — check]`
+or left as suggestions with the original step intact; ledgers grow as
+appendices rather than being rewritten. Artifact size is monotone
+non-growing per round; a violation is a protocol alarm (`review-panel.md`,
+Phase F).
 
 A run is finished when it has produced its deliverable — a draft, a
-manuscript, a progress report, or a parked state with a decision list — and
+manuscript, a progress report, a **negative-value assessment**, or a parked
+state with a decision list — and
 handed the decision list to the user. Any other exit is a return to the
 working loop or a parked thread in the dossier.
 
@@ -178,17 +265,23 @@ canonical statement, §2). Sections, in order:
 | **Notation** | One fixed notation block; all entries must use it. |
 | **Examples & computations** | Dated table: case, computed value, pattern observed. |
 | **Reformulations & connections** | Numbered forms, each with "useful because…" and a date. |
+| **Wild-ideas register** | `speculative` ideas — conjectures, reformulations, analogies, technique transfers not yet claims; exempt from the ledger and panel attack; ≤ 15 active, the rest archived with revival triggers; terminal-verdict fragments land here (§2, §8). |
 | **Literature map** | Sources read: theorem, reference, what it leaves open. |
-| **Knowledge State** | Rewritten-at-session-end living summary: conjectures registry, obstructions register, champion draft pointer, dependency backlinks (§3). |
+| **Knowledge State** | Populated-and-maintained-at-session-end living summary; the navigation index a fresh session reads first: conjectures registry, obstructions register, champion draft pointer, dependency backlinks (§3). |
 | **Attempts log** | Append-only, dated (§4.3). The heart of the protocol. |
 | **Claims & verification ledger** | Every claim's lifecycle (§8), including formalization status. |
-| **Panel & check ledger** | Each round's run: mode (normal/fast), panel roles (A1, A2, X/A3, R, M — or fast A+B), whether X ran, streamline run (S), panel verdict, high-level check verdict, routing. |
+| **Panel & check ledger** | Each round's run: round type, tier (screening/fast/normal), panel roles (A1, A2, X/A3, R, M — or fast A+B), whether X ran, panel verdict, high-level check verdict (or negative-value assessment on negative rounds), routing. |
 | **Round timing** | Per-round start/end timestamps and elapsed time, with a phase breakdown. |
+| **Portfolio & threads** | Ranked open threads with a fixed budget split (70% champion / 20% runners-up / 10% wild), re-ranked each round by the idea-yield metric; GAP-owner threads hold the champion share (§6). |
 | **Open threads / next steps** | The attack queue. Every entry ends with a concrete next step. |
 
 Rules that make the dossier work: append-only (never rewrite history); dated;
 notation-locked; every entry ends with a next step; a fresh session reads the
-dossier in full before anything else.
+dossier in full before anything else. Once the dossier exceeds ~30 KB it
+splits by section into `claims-ledger.md`, `attempts-log.md`, and
+`version-inventory.md`; the top-level dossier stays as the navigation index
+(Knowledge State), question.md stays at the top, and the split files keep
+the record append-only without concurrent-edit conflicts.
 
 **Artifact versions.** Every draft, progress report, and manuscript carries a
 version (`v1`, `v2`, …), incremented each time a new one is produced; review
@@ -210,7 +303,27 @@ artifact + version), and **dependency backlinks** between claims and the
 artifacts that build on them. When a claim hits `counterexample`, its
 dependents are flagged `affected` and re-verified before reuse. The Knowledge
 State keeps the live picture readable even after the archive outgrows a
-context window.
+context window. It is the dossier's **navigation index** — populated and
+maintained every session, never a leftover template — and the first thing a
+fresh session reads (§4.1).
+
+**The wild-ideas register.** The dossier section holding `speculative`
+ideas — conjectures, reformulations, analogies, technique transfers that are
+not yet claims. Entries are exempt from the verification ledger and from
+panel attack and leave only by nomination, to `promising` (§8). The register
+is **bounded**: ≤ 15 *active* wild ideas; the rest are archived with their
+revival triggers and re-checked only when a trigger fires or the idea-yield
+ranking promotes them. Every terminal verdict deposits its fragments here —
+the maximal true subcase, the obstruction, the closest technique — with
+revival triggers (the fragments rule, §8). **Revival triggers** are evaluated
+by the auditor at each run and by the sprint's analogy/transfer agent at
+each round.
+
+**The portfolio.** Open threads are a ranked population with a fixed budget
+split — **70% champion / 20% runners-up / 10% wild** — re-ranked each round
+by the **idea-yield metric** (accepted claims + promoted ideas + new
+subgoals per unit cost per thread, computed from the ledgers). GAP-owner
+threads hold the champion share until the ladder floor (§6).
 
 **Artifact layout.** Artifacts live in `<project root>/research/`; the dossier
 and question.md stay at the top. Once a kind — drafts, manuscripts, reports
@@ -242,7 +355,8 @@ Every session — and every hour of a long session — runs this loop:
 ```
 
 ### 4.1 Session start
-1. Read the dossier and question.md in full.
+1. Read the dossier in full — Knowledge State first — and question.md in
+   full.
 2. Restate the problem in your own words and compare with the locked
    statement — this catches definition drift early.
 3. Take the top "next step" written by the previous session. Do not start a
@@ -325,6 +439,14 @@ determines which side is right, and hands the settled version back for the
 manuscript. What cannot be fixed is recorded honestly as an open item, with
 the reason (`review-panel.md`, Phase F).
 
+**The formalization anchor.** At least one load-bearing lemma per project is
+delegated for Lean 4/mathlib formalization (an M12 delegation,
+`modules/prompts.md` §6) — the only check the next round's gate cannot
+overturn. Self-contained packages (e.g., a provable d=1 subproblem) are the
+default first target. The delegation is bounded by the run envelope like any
+M12 task; if no lemma is delegated, the reason is recorded in the dossier
+(§8's `formalized`/`unformalized` flags and the delivery note).
+
 ## 6. The stuck ladder
 
 A thread is stalled when two consecutive sessions on it produced no progress.
@@ -333,6 +455,13 @@ order*; you may not skip a rung. Only after its final rung may a thread be
 marked `stalled` — with the reason and a one-line "resume here" — and a new
 thread opened. A stalled thread is a storage state, not a verdict; the
 problem itself never becomes abandoned.
+
+**GAP-owner discipline.** One thread owns one GAP across multiple rounds
+until the stuck-ladder floor is reached: the owner attacks it from different
+angles — each angle recorded in the attempts log — and targets change only
+at a floor verdict. The portfolio reserves the champion share for the
+GAP-owner (§3). A GAP is attacked from ≥ 2 angles across rounds before it
+may be abandoned.
 
 ## 7. Anti-give-up rules
 
@@ -372,9 +501,17 @@ independent review — the main goal is not special.
 **Lifecycle:**
 
 ```
-claimed → under-review → accepted | rejected | counterexample
+speculative → promising → claimed → under-review → accepted | rejected | counterexample
 ```
 
+- `speculative` — a wild idea, not yet a claim: exempt from the verification
+  ledger and from panel attack; leaves the register only by nomination, to
+  `promising` (§3, "The wild-ideas register").
+- `promising` — nominated for development: may be built upon *heuristically*
+  in exploration, every use labeled `heuristic use of <claim vN>`; never a
+  premise in any delivered artifact; may appear in drafts, labeled; never in
+  user-facing reporting of established results; not subject to review until
+  nominated as `claimed`.
 - `claimed` — the agent believes the result; recorded with the claim text and
   the location of its proof. Nothing may build on it yet.
 - `under-review` — handed to an independent session. Still nothing may build
@@ -395,6 +532,21 @@ claimed → under-review → accepted | rejected | counterexample
 
 - A claim in `claimed` or `under-review` is never used as a premise — not by
   later lemmas, not in reporting to the user.
+- **Screening before the panel.** Every claim **nominated for the
+  verification pipeline** — entering `claimed`/`under-review` — runs the
+  prompts.md §1 claim-reviewer format (the screening tier, §2) *before* any
+  panel decision. Only screening-passing claims — or load-bearing ones
+  explicitly nominated — reach the panel. A claim that fails screening
+  returns to the loop as a repair task; the ≤ 2-repair rule applies.
+  `speculative` and `promising` ideas are exempt — they are not yet claims
+  in the pipeline.
+- **Depth escalation.** Per-claim verification depth is non-decreasing
+  across rounds: `screening → panel → formalization`. A claim that survives
+  round N is not re-checked at the same depth in round N+1; the ledger's
+  `depth` column tracks claim-level depth. A gate verdict is *descriptive
+  routing* — to the next depth or to the user — never a certificate.
+  Artifact hygiene (the hygiene linter, §2) is the separate axis, run every
+  round in every tier.
 - **The repair loop is bounded:** at most two review rounds per session. A
   claim still rejected after two rounds is parked as `rejected` with its full
   history; a fresh attack starts a new thread.
@@ -413,9 +565,16 @@ claimed → under-review → accepted | rejected | counterexample
 - **The panel is measured.** A periodic auditor (every few runs, or on
   request) reads both ledgers and computes: ritualism (Phase-A `gap` tags
   later withdrawn), gate leakage (`pass` manuscripts accumulating `rejected`
-  claims), and per-reviewer agreement rates. Canary panels — a seeded
-  known-false claim — measure the detection rate. Results are recorded in
-  the dossier and fed back as standing panel instructions.
+  claims), per-reviewer agreement rates, and **premature kills** — ideas
+  `rejected`/`fail`ed/parked that later proved right (a later round, the
+  literature, or the user). A single premature kill is a protocol alarm;
+  the rate distinguishes **opinion-kills** (verdict-based; a process defect)
+  from **evidence-kills** (counterexample-based; correct behavior). The
+  auditor also evaluates revival triggers at each run and computes the
+  idea-yield metric (§3). One **canary panel** — a seeded known-false claim
+  — is mandatory before the first normal-mode delivery on a new project; it
+  measures the panel's real detection rate. Results are recorded in the
+  dossier and fed back as standing panel instructions.
 - **Diversity is recorded.** Every panel and review row carries the
   reviewer's model/backend, its role (A1 counterexample hunter, A2 step
   validator, A3 architecture critic, X exterior, or fast-mode A/B), and
@@ -427,9 +586,9 @@ claimed → under-review → accepted | rejected | counterexample
 **In the Spell pipeline.** Individual claims are verified by single
 independent sessions (ready-to-paste reviewer prompt in §11). The manuscript
 itself is produced by the review panel (`review-panel.md`) — whose three
-reviewers include the exterior agent X when available — then streamlined
-(§2) and gated by the high-level check (`high-level-check.md`). A panel
-verdict or a high-level
+reviewers include the exterior agent X when available — written surgically
+with the streamline step folded into M (§2), and gated by the high-level
+check (`high-level-check.md`). A panel verdict or a high-level
 check `pass` is independent review — much stronger than self-checking, but
 never a formal proof, and it never overrides a rejected claim in the ledger.
 
@@ -470,6 +629,18 @@ never a formal proof, and it never overrides a rejected claim in the ledger.
   one precise, tedious task and writes its result into the dossier; it does
   not grade the delegating agent's work (§5.1). Verdicts still come only from
   independent review sessions (§8, §11).
+- **Live timestamps.** Phase timestamps are recorded at the moment — the
+  orchestrator runs `date` — never reconstructed from notification times or
+  backfilled after the fact; a violation is a protocol alarm (§2, "Round
+  timing").
+- **Codex pipeline.** When the exterior agent runs through the Codex CLI
+  (`codex exec`), point it at a writable output dir — or use standardized
+  markers in the prompt — so its artifact is written there instead of being
+  re-read from 50–100 KB of terminal output; the default is kimi/k2.7/api
+  (no sandbox) unless codex is required (§10).
+- **Agent resume for repairs.** A repair resumes the panel/author agent that
+  produced the artifact — keeping its context — instead of re-reading
+  everything fresh (§2, "Repair-scoped rounds").
 
 ## 10. Startup checklist
 
@@ -485,7 +656,11 @@ When a new Spell project begins, in order:
    then runs internal A1 + A2 + A3 with explicit roles. Record the choice in
    the dossier. If X is chosen but unavailable at panel start, the panel
    falls back to A1 + A2 + A3 and records `X unavailable — reduced diversity,
-   A1+A2+A3 roles, confidence downgraded` (§8).
+   A1+A2+A3 roles, confidence downgraded` (§8). At startup the harness also
+   verifies that `X_MODEL` is not the same provider family as the internal
+   harness; if it is — or X is unavailable — the run is auto-labeled
+   `reduced diversity` with a confidence downgrade (one-line check,
+   non-negotiable).
 2. **Ask the user the output form** — PDF, LaTeX, Markdown, or HTML — and
    record the answer (`definition.md`, "Output form").
 3. **Fix the round count.** Ask the user how many rounds to run — `ROUNDS`,
@@ -494,10 +669,13 @@ When a new Spell project begins, in order:
    "Rounds"). Record it in the dossier.
 4. **Fix the run envelope.** `RUN_LENGTH`, chosen at project start. Record it
    in the dossier.
-5. **Fix the round mode.** Ask whether round 1 runs in **normal mode** (the
-   5-agent panel, phases A–F) or **fast mode** (the 2-agent loop); record
-   `mode: normal | fast` in the dossier. Re-ask at the start of every later
-   round.
+5. **Propose the round tier.** At the start of every round the orchestrator
+   proposes a tier from the round type — exploratory → screening; negative →
+   fast; repair-scoped → the cheapest tier that can check the listed
+   conditions (normal only when a listed condition is load-bearing);
+   manuscript-bound → normal. The user may override; the choice is recorded
+   in the dossier and binds the round (§2). Re-proposed at the start of
+   every round.
 6. **Create the dossier** (template in §12 below), filling in the locked
    problem statement (`Q v1`), notation, output form, round count, run
    envelope, and the exterior-agent choice (X or none).

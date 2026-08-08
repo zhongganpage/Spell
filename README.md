@@ -4,10 +4,13 @@ Spell is a **universal protocol that enhances proof generations** based on adver
 multi-agent cross-review procedures. You can use it on ANY agentic systems such as
 Claude Code, CodeX, Kimi Code and etc, and you can personalize it in whatever way you want by using these agents.
 
-Every round runs in **normal mode**
-(5-agent panel with mutual attacks and rebuttals, phases A–F, plus the high-level check) or **fast mode** (a
-2-agent A/B attack/rebut loop that skips the high-level check). My personal experience is that for
-Kimi Code + Deepseek-v4-flash, the normal mode will output a fine manuscript within 2
+Every round runs in one of three
+**tiers** — **screening** (per-claim claim-reviewer review), **fast** (a
+2-agent A/B attack/rebut loop), or **normal** (the 5-agent panel, phases A–F,
+plus the high-level check) — auto-selected from the round type at round start
+with your override, and is timed automatically — the round time with its
+phase breakdown is shown at the end of every round in every tier. My personal experience is that for
+Kimi Code + Deepseek-v4-flash, it will output a fine manuscript within 2
 hours and the cost is less than 1 US dollar. Have fun :)
 
 > **Input:** a rough idea or a manuscript → **Output:** a finer manuscript.
@@ -21,45 +24,66 @@ needed to deepen your thoughts.
 
 ## What it is
 
-A single agent works on the problem and writes up its results as a
-**draft**. A **review panel** of adversarial agents attacks the draft, attacks
-each other's attacks, and rebuts; a **ranking agent** weighs the whole record;
-a separate **manuscript agent** writes the **manuscript** from that ranking.
-A **streamline agent** then tightens the manuscript before an independent
-**high-level check** judges novelty and sufficiency.
+A round opens with a bounded parallel **idea sprint**: 3–5 explorer agents
+plus a recombination agent propose candidate attacks, each with the cheapest
+discriminating test. A single agent then works on the problem and writes up
+its results as a **draft**, which a deterministic **hygiene linter** passes
+first — equations, citations, brackets, and constants checked mechanically
+before any review. A **review panel** of adversarial agents attacks the
+draft, attacks each other's attacks, and rebuts; a fresh-context **promoter**
+runs alongside it, pushing the champion idea as far as it goes. A **ranking
+agent** weighs the whole record; a separate **manuscript agent** writes the
+**manuscript** from that ranking — surgically, patching only the sections the
+record changed, the streamline step folded in. An independent **high-level
+check** judges novelty and sufficiency; its routing is **non-terminal** —
+`conditional` / `fail` demote the direction and attach revival triggers, and
+you steer the next step. A negative round delivers an assessed rule-out — a
+**negative-value assessment** — in place of a forced manuscript.
 Only a manuscript that passes is delivered.
 
-Every run ends with a deliverable (draft,
-manuscript, or progress report) plus a decision list for you; the dossier carries the state between runs, and
-you decide between them.
+Every run ends with a deliverable (draft, manuscript, progress report, or
+negative-value assessment) plus a decision list for you; the dossier carries
+the state between runs, and you decide between them.
 
 ## How it works
 
-**First round, normal mode** — the 5-agent panel (A1, A2, X/A3, R, M;
-phases A–F) reviews the draft, and the high-level check gates delivery
-(`pass` → deliver; `conditional` / `fail` → back to the working loop).
+**First round, normal tier** — the idea sprint proposes candidate attacks,
+the 5-agent panel (A1, A2, X/A3, R, M, plus the promoter; phases A–F)
+reviews the draft, and the high-level check routes non-terminally
+(`pass` → deliver; `conditional` / `fail` → demote + revival triggers, and
+you decide: repair / park / re-scope).
+
+![Spell workflow v2](workflow-v2.svg)
+
+*Figure — the updated pipeline: idea sprint → hygiene linter → tier → panel + promoter → surgical manuscript → non-terminal check → deliverable; the wild-ideas register and the idea/claim lifecycle lane at the bottom.*
 
 ```
-rough idea ────────────────► working loop ────► draft ──┐
+idea sprint ────────────────────────────────────────────┐
                                                         │
-                                                        ▼
-manuscript (input) ─────────────────────────────────► review panel ──► manuscript (+ change list)
-                                                                        │
-                                                                        ▼
-                                                                 streamline (agent S)
-                                                                        │
-                                                                        ▼
-                                                           high-level check (novelty + sufficiency)
-                                                                        │
-                                                                        ▼
-                                                               deliverable + decisions
-                                                                        │
-                                                                        ▼
-                                                                 you decide → next run
+rough idea ────────────────► working loop ──► draft ────┼──► hygiene linter ─┐
+manuscript (input) ─────────────────────────────────────┘                    │
+                                                                             │
+                                                                             ▼
+                                                           tier: screening | fast | normal
+                                                           (normal = 5-agent panel + promoter)
+                                                                             │
+                                                                             ▼
+                                                           manuscript (surgical; streamline folded into M)
+                                                                             │
+                                                                             ▼
+                                                           high-level check (non-terminal routing)
+                                                                             │
+                                                                             ▼
+                                                           deliverable + decisions · negative rounds:
+                                                           negative-value assessment (every tier)
+                                                                             │
+                                                                             ▼
+                                                           you decide → next run
 ```
 
-**Inside the review panel (normal mode)** — phases A–F, five agents; all run
-in the background, and each phase starts only when its written inputs exist.
+**Inside the review panel (normal tier)** — phases A–F, five agents, with
+the promoter running alongside; all run in the background, and each phase
+starts only when its written inputs exist.
 
 ```
 draft / input manuscript
@@ -80,38 +104,68 @@ Phase C — cross-review: each judges the other two ──► cross-judgements
 Phase D — rebuttal: each answers the criticisms of its own report
   │
   ▼
-Phase E — R (ranking agent): reads the full record, ranks the ideas,
+Phase E — R (ranking agent): reads the full record — including the
+          promoter's "nearest true version" note — ranks the ideas,
           closes the three reviewers
   │
   ▼
-Phase F — M (manuscript agent): writes the manuscript + change list
+Phase F — M (manuscript agent): surgical manuscript + change list
+          (patches only the sections the record changed; streamline folded in)
   │
   ▼
-streamline (S) ──► high-level check ──► deliverable + decisions
+hygiene linter ──► high-level check (non-terminal routing)
+  │
+  ▼
+deliverable + decisions · negative rounds: negative-value assessment (every tier)
 ```
+
+The **promoter** — a fresh-context agent running alongside the panel — pushes
+the champion idea as far as it goes: the strongest honest version, the
+maximal true fragment, exactly where it breaks. Its "nearest true version"
+note enters the record, and Phase E and Phase F read it.
 
 - **Working loop** — persistence protocol: dossier, attempts log, a Pólya-style
   transformation toolkit (compute examples, specialize, reformulate, …), a
   stuck ladder with a minimum-output floor, anti-give-up rules, and delegation
   of tedious work to sub-agents (drafts stay high-level; manuscript sub-agents
-  fix contradictions between agents). A **manuscript input** skips this loop
-  and the draft, entering the review panel directly — shorter rounds. The
-  input document is converted into `question.md` at round 1, and each round
-  appends its subgoals to it.
+  fix contradictions between agents). Each round opens with a bounded **idea
+  sprint** (≤ 10% of the round budget): 3–5 explorer agents plus a
+  recombination agent propose candidate attacks, each with the cheapest
+  discriminating test; all candidates — survivors and discards — enter the
+  wild-ideas register with revival triggers. A **manuscript input** skips
+  this loop and the draft, entering the hygiene linter and the panel directly
+  — shorter rounds. The input document is converted into `question.md` at
+  round 1, and each round appends its subgoals to it.
 - **Review panel** — 5 agents, phases A–F: three reviewers (A1
   counterexample-hunter, A2 step-validator, and X — an **exterior agent**
   from a different provider, or an internal A3 architecture-critic when you
-  have no X), then ranking, then manuscript. All agents run in the background;
-  every manuscript version comes with a **change list** (what changed, why,
-  and which changes are important). A **streamline agent** then simplifies
-  the manuscript before the **high-level check** (normal mode only); a
-  per-round **fast mode** (asked at the start of each round) replaces the
-  panel with a 2-agent attack/rebut loop and delivers after streamlining —
-  no high-level check.
-- **Verification** — every claim runs `claimed → under-review →
-  accepted | rejected | counterexample`; no agent grades its own homework.
+  have no X), then ranking, then manuscript, with a fresh-context **promoter**
+  running alongside the panel. All agents run in the background; every
+  manuscript version comes with a **change list** (what changed, why, and
+  which changes are important). M writes **surgically** — only the sections
+  the record changed, the streamline step folded in — and the **hygiene
+  linter** passes before any review and again before delivery. The per-round
+  **tier**, proposed from the round type at round start with your override,
+  selects the pipeline weight: **screening** (per-claim claim-reviewer
+  review; default for exploratory rounds) · **fast** (a 2-agent attack/rebut
+  loop; default for negative and repair-scoped rounds, escalating to normal
+  only for a load-bearing condition) · **normal** (the full panel plus the
+  high-level check; required for load-bearing or manuscript-bound claims).
+- **Verification** — every claim runs `speculative → promising → claimed →
+  under-review → accepted | rejected | counterexample`. `speculative` ideas
+  live in the wild-ideas register, exempt from the verification ledger and
+  panel attack until nominated; `promising` claims may be built upon
+  heuristically in exploration (every use labeled `heuristic use of <claim
+  vN>`) but never appear as premises in delivered artifacts. No agent grades
+  its own homework.
 - **High-level check** — an independent gate on novelty and sufficiency
-  before delivery. It is independent review, never a certificate.
+  before delivery (normal tier). Its routing is **non-terminal**:
+  `conditional` / `fail` demote the direction and attach revival triggers;
+  you steer the next step (repair / park / re-scope) — never an automatic
+  continue. On negative rounds the deliverable is a **negative-value
+  assessment** — an assessed rule-out, produced by a dedicated cheap agent
+  in every tier — replacing the high-level check. It is independent review,
+  never a certificate.
 
 ## Repository layout
 
@@ -124,7 +178,7 @@ Spell/
 ├── skills/spell/          the skill package — copy this folder to install
 ├── modules/               on-demand details
 │   ├── toolkit.md             transformation toolkit M1–M12 + stuck ladder
-│   ├── prompts.md             paste-ready prompts (reviewer · panel · ranking · manuscript · check · streamline · fast mode)
+│   ├── prompts.md             paste-ready prompts (reviewer · panel · ranking · manuscript · check · linter · sprint · promoter)
 │   ├── dossier-template.md
 │   └── providers.md           exterior agent variables + provider table
 └── reference/             authoritative full rules (archive; read only to audit)
@@ -180,14 +234,19 @@ skills/spell/
    statement and notation, open the first thread. Convert the input document
    (any format — `.tex`, `.md`, `.pdf`, …) into `question.md`, the canonical
    statement.
-4. Input the rough idea or the manuscript. A manuscript input goes straight
-   to the panel; from then on: draft → panel → manuscript → streamline →
-   high-level check → deliverable + decision list (normal mode; fast
-   rounds skip the high-level check).
-5. Every round starts by asking the **round mode**: **normal mode** (the
-   5-agent panel, phases A–F) or **fast mode** (a 2-agent A/B attack/rebut
-   loop — the panel is not run in a fast round). The choice is recorded in
-   the dossier and binds the whole round.
+4. Input the rough idea or the manuscript. A manuscript input skips the
+   working loop and the draft, entering the hygiene linter and the panel
+   directly; from then on: draft → hygiene linter → tier → surgical
+   manuscript → high-level check → deliverable + decision list (normal tier;
+   fast and screening rounds skip the high-level check; negative rounds
+   deliver a negative-value assessment).
+5. Every round starts with the **tier**: the orchestrator proposes one from
+   the round type — **screening** (per-claim claim-reviewer review; default
+   for exploratory rounds), **fast** (a 2-agent A/B attack/rebut loop; default
+   for negative and repair-scoped rounds), or **normal** (the 5-agent panel,
+   phases A–F; required for load-bearing or manuscript-bound claims) — and
+   you may override. The choice is recorded in the dossier and binds the
+   whole round.
 
 ## Design principles
 
@@ -215,6 +274,32 @@ skills/spell/
   discipline elsewhere.
 - **Nothing is a certificate.** Panel verdicts and high-level checks are
   independent review, not formal proof.
+- **Nothing delivered rests on a non-accepted premise.** Ideas are free to
+  develop, but the delivery gate is fixed: no delivered artifact builds on
+  an unaccepted premise.
+- **Opinions rank; only demonstrated counterexamples kill.** "Known",
+  "beyond reach", "misdirected" are opinions — they demote and attach revival
+  triggers, never terminate. The only terminal state for an idea is a
+  demonstrated counterexample with a reproducible computation (you may always
+  park a thread yourself; the no-kill rule binds the protocol, not you).
+- **Deterministic checks beat model checks for mechanical error classes.**
+  Units, citations, brackets, and numerical exact-case reproductions are
+  linter/script territory, not reviewer territory.
+- **Round type selects pipeline weight.** Screening, negative, repair, and
+  manuscript-bound rounds do not all run the 5-agent panel; the tier is
+  proposed from the round type at round start, with your override.
+- **The loop converges monotonically.** Artifact size non-growing, open
+  condition count non-increasing, per-claim verification depth non-decreasing
+  — any violation is a protocol alarm.
+- **The user steers at verdicts.** `conditional` / `fail` / negative-outcome
+  routing is a user decision (repair / park / re-scope), never an automatic
+  continue.
+- **Ground truth is un-overturnable.** A formalized lemma (Lean 4) is the
+  only check the next round's gate cannot overturn; load-bearing claims
+  should be anchored to it where feasible.
+- **Budget is conserved.** The savings from tier selection fund the new
+  phases — the idea sprint, hygiene linter, promoter, and negative-value
+  assessment — and the total per-round agent budget does not grow.
 
 ## Provenance
 
@@ -222,4 +307,5 @@ The protocol synthesizes two research-protocol ideas — the *Persistence
 Protocol* (never give up, record everything) and the *Independent
 Verification Protocol* (no agent grades its own homework) — adapted to a
 multi-agent pipeline. `reference/self-review.md` records a two-agent critical
-review of the design and the decisions taken since.
+review of the design and the decisions taken since, including the 2026-08-08
+architecture-update plan and its implementation (addendum §8).

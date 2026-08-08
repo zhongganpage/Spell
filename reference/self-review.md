@@ -163,3 +163,45 @@ Implementation status: reflected in `definition.md`, `review-panel.md`,
 `protocol.md`, and `README.md`. Still open from the report: the rest of
 Tier 1 (grounding, measurement loop, living Knowledge State in the dossier)
 and the open decisions in §6.
+
+---
+
+## 8. Addendum — implementation of UPDATE-PLAN.md (2026-08-08)
+
+The architecture-update plan (`UPDATE-PLAN.md`, rev. 2) is **LOCKED**
+(approved 2026-08-08, nine review fixes applied) and implemented in the
+specification files per its change map (§5). This addendum is appended; all
+earlier sections of this report stand unchanged.
+
+**Three tracks**
+
+1. **Governance & hygiene (Phase 1)** — tier-selection policy with binding
+   defaults (`screening` · `fast` · `normal`, proposed from the round type,
+   user override); claim-reviewer screening as the default gate; the
+   deterministic **hygiene linter**; X-diversity enforcement (auto-labeled
+   `reduced diversity`); the numerics guardrail (exact-case reproduction,
+   two independent scripts, role separation); GAP-owner discipline.
+2. **Convergence (Phase 2)** — non-terminal gates: opinions demote and attach
+   revival triggers; only a demonstrated counterexample is terminal; the
+   fragments rule; the **negative-value assessment** (it replaces — not
+   mimics — the high-level check on negative outcomes, in every tier);
+   repair-scoped rounds (scope frozen, user-gated); depth escalation;
+   surgical manuscripts (streamline folded into M); Knowledge State +
+   dossier split; adaptive phase depth.
+3. **Discovery & retention (Phase 3)** — `speculative → promising` lifecycle
+   (promising may be built upon heuristically, labeled, never a delivered
+   premise); the bounded idea sprint (explorer + recombination agents); the
+   promoter role; the idea scoreboard + provenance tags; portfolio allocation
+   with the idea-yield metric; the auditor's premature-kill metric and the
+   mandatory canary panel; the formalization anchor.
+
+**Nine review fixes** — applied to reach rev. 2; the item bodies carry the
+corrected scope (e.g., the sprint feeds the GAP-owner without opening new
+target queues; the wild-ideas register stays bounded). The two run
+post-mortems (LDP-homog, nonexistence-L2) supplied the empirical findings.
+
+**Status: LOCKED.** Implemented across `README.md`, `definition.md`,
+`protocol.md`, `review-panel.md`, `high-level-check.md`, and the `modules/`
+per UPDATE-PLAN.md §5; the updated pipeline (idea sprint → hygiene linter →
+tier → surgical manuscript → non-terminal high-level check → deliverable,
+negative-value assessment on negative rounds) is reflected in the README.

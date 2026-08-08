@@ -28,26 +28,56 @@ window). The harness runs that many rounds before stopping.
 - **question.md** — the canonical statement file, converted from the input
   document at project start; subgoals appended after each round.
 - **round** — one full cycle from the input artifact to the next delivered
-  manuscript: rough-idea rounds run the working loop and a draft first,
-  manuscript-input rounds start at the panel; every round ends with
-  manuscript → streamline → high-level check. The count `ROUNDS` (1–10) is
-  chosen at the start of round 1.
+  artifact (manuscript + change list, negative-value assessment, or progress
+  report): exploratory/manuscript-bound rounds run the working loop (with the
+  idea sprint) and a draft first, manuscript-input rounds start at the hygiene
+  linter; negative and repair-scoped rounds are shorter; every round ends with
+  the hygiene linter. The count `ROUNDS` (1–10) is chosen at the start of
+  round 1.
+- **round type** — what the round is for; selects the **tier**:
+  `exploratory` (default tier **screening**), `negative` (rule-out
+  assessment; default tier **fast**; delivers a **negative-value
+  assessment**), `repair-scoped` (fixes only the listed conditions of a
+  `conditional` verdict; scope frozen; user-gated), `manuscript-bound`
+  (delivers a manuscript; tier **normal**).
+- **tier** — pipeline weight chosen at round start from the round type
+  (orchestrator proposes; user may override; recorded in the dossier; binds
+  the round): **screening** (claim-reviewer format on every claim nominated
+  for the verification pipeline; no manuscript) / **fast** (2-agent A/B loop;
+  skips panel + high-level check; confidence downgrade) / **normal**
+  (5-agent panel + promoter, phases A–F + high-level check; required only for
+  load-bearing or manuscript-bound claims).
+- **negative-value assessment** — the deliverable of a negative round, in
+  every tier: was the direction truly ruled out (exact cases, fetched
+  literature, verified computation) or did the tool just fail? Produced by a
+  dedicated cheap agent; assesses, never certifies; replaces the high-level
+  check for negative outcomes; recorded in the wild-ideas register under the
+  fragments rule. Verdicts: `ruled-out-with-evidence` | `tool-failure`.
+- **wild-ideas register** — dossier section for **speculative** ideas
+  (conjectures, reformulations, analogies, technique transfers not yet
+  claims): exempt from the verification ledger and panel attack; leaves only
+  by nomination; bounded (≤ 15 active; the rest archived with revival
+  triggers).
+- **promising** — claim state between `speculative` and `claimed`; may be
+  built upon heuristically in exploration, every use labeled `heuristic use
+  of <claim vN>`; never a premise in any delivered artifact or in user-facing
+  reporting of established results.
 - **review report · cross-judgement · rebuttal · ranking** — panel records.
 
 ## Pipeline
-working loop → draft → review panel → manuscript → streamline → high-level
-check → deliverable + decisions (the high-level check is normal-mode only;
-fast rounds deliver after streamlining). The review panel is either
-**normal mode**
-(the 5-agent panel, phases A–F) or **fast mode** (a 2-agent A/B loop) — the
-user picks the mode at the start of every round ("Round mode" below). A
-**manuscript input** — a complete
-document, or the previous round's output — skips the working loop and the
-draft and enters the review panel directly: shorter rounds. With `ROUNDS`
-set at round 1, the harness runs that many rounds before stopping; each
-round appends its subgoals to question.md, records its time cost, and
-produces the next manuscript version. Full detail in `reference/`;
-paste-ready prompts in `modules/prompts.md`.
+working loop (+ **idea sprint** at round start) → draft → **hygiene linter**
+→ **tier** (screening | fast | normal panel with promoter) → **manuscript**
+(surgical — streamline folded into M) → **high-level check** (non-terminal
+routing) → deliverable + decisions. The tier is proposed from the round type
+at the start of every round; the user may override ("Round tier" below).
+Negative rounds deliver a **negative-value assessment** in every tier;
+repair-scoped rounds are scope-frozen and user-gated. A **manuscript input**
+— a complete document, or the previous round's output — skips the working
+loop, the idea sprint, and the draft, and enters the pipeline at the hygiene
+linter: shorter rounds. With `ROUNDS` set at round 1, the harness runs that
+many rounds before stopping; each round appends its subgoals to question.md,
+records its time cost, and produces the next artifact version. Full detail in
+`reference/`; paste-ready prompts in `modules/prompts.md`.
 
 ## Project start
 The **very first question** is a choice: configure the exterior reviewer X
@@ -57,11 +87,11 @@ the panel then runs internal A1 + A2 + A3 with explicit roles. Then the
 output form (PDF / LaTeX / Markdown / HTML), then the **round count**
 (1–10; recommend ≤ 10 — the accumulated record grows each round and beyond
 that can exceed the context window), then the run envelope (`RUN_LENGTH`),
-then the **round-1 mode** — **normal mode** (the 5-agent panel) or **fast
-mode** (the 2-agent loop; "Round mode" below) — then the dossier. Ask these
+then the **round-1 tier** — proposed from the round type (screening | fast |
+normal; user may override; "Round tier" below) — then the dossier. Ask these
 before any work starts; a no-X panel records `X unavailable — reduced
-diversity` and a confidence downgrade. The mode is asked again at the start
-of every later round.
+diversity` and a confidence downgrade. The tier is proposed again at the
+start of every later round.
 
 ## Input → question.md
 At round 1, convert the input document — whatever its format (`.tex`, `.md`,
@@ -71,18 +101,19 @@ subgoals obtained that round (open threads, ranking suggestions,
 high-level-check targets). The next round opens by reading question.md.
 
 ## Round timing
-Every round — **normal and fast alike** — is timed by the orchestrator, and
+Every round — **every tier alike** — is timed by the orchestrator, and
 the timestamps appear to the user as the round runs and at its end; timings
 are never reconstructed after the fact. At round start, announce
 `Round N started <ISO timestamp>` and write it in the dossier **before
 spawning any agent**. At each phase boundary, record — and show — the
-phase's start/end timestamps in the Round timing table (loop / draft /
-panel / manuscript / streamline / check; the normal-mode panel phases A–F
-are timed too; fast rounds have no check phase). At round end, compute the
+phase's start/end timestamps in the Round timing table (loop / sprint /
+draft / linter / panel / manuscript / check; the normal-tier panel phases
+A–F are timed too; screening and fast rounds have no check phase — negative
+rounds run the negative-value assessment instead). At round end, compute the
 elapsed time from the recorded timestamps, fill the table, and **show the
-round time to the user in every mode**: a visible line in the closing
+round time to the user in every tier**: a visible line in the closing
 deliverable/decision-list message, e.g. `Round 1: 08:55 → 09:05, elapsed
-~10 min (draft 1m · attack 3m · manuscript 3m · streamline 3m)`, always
+~10 min (draft 1m · attack 3m · manuscript 3m · linter 1m)`, always
 including the total and, when available, the phase breakdown. Timestamps
 are wall-clock times the orchestrator reads at the moment of the event
 (e.g. `date`), recorded in a fixed format.
@@ -93,11 +124,34 @@ LOAD dossier + question.md → ATTACK one toolkit move (`modules/toolkit.md`) �
 stuck ladder → floor (trial proof with `GAP:` labels, or a worked example).
 Never end a session on failure; end on the next action.
 
+## Idea sprint
+At round start, a bounded (≤ 10% of the round budget) parallel sprint: 3–5
+explorer agents (specialize / reformulation hunter / analogy-transfer — which
+also evaluates revival triggers / wildcard) plus a **recombination agent**
+pairing unrelated dossier entries. Each candidate returns with the cheapest
+discriminating test; survivors and discards alike enter the **wild-ideas
+register** with revival triggers. The sprint feeds the GAP-owner; it does not
+open new target queues.
+
+## Hygiene linter
+A deterministic mechanical pass (one cheap agent/script), run before any
+review phase and before delivery in **all tiers**: every displayed equation
+checked for dimensional/normalization consistency (factor-2, brackets,
+per-edge vs per-volume); every citation checked against fetched records
+(locators present, not corrupted); every bracket/range/constant checked
+against the manuscript's own tables and the notation lock. Not a reviewer.
+
 ## Invariant rules
 1. **No agent grades its own homework** — author confidence is never a verdict.
-2. **Claims:** `claimed → under-review → accepted | rejected | counterexample`.
-   Nothing builds on a non-`accepted` claim; reviewer verdict outranks author
-   confidence; ≤ 2 repair rounds per claim per session.
+2. **Claims lifecycle:** `speculative → promising → claimed → under-review →
+   accepted | rejected | counterexample`. `speculative` ideas live in the
+   wild-ideas register — exempt from the verification ledger and panel attack;
+   they leave only by nomination. `promising` claims may be built upon
+   heuristically in exploration, every use labeled `heuristic use of <claim
+   vN>`; they are never premises in any delivered artifact or in user-facing
+   reporting of established results. Nothing builds on a non-`accepted` claim;
+   reviewer verdict outranks author confidence; ≤ 2 repair rounds per claim
+   per session.
 3. **Recording is mandatory.** Dead ends must be recorded; the dossier is the
    memory — append-only, dated, notation-locked, every entry ends with a next
    step.
@@ -113,15 +167,22 @@ Never end a session on failure; end on the next action.
    contradictions honestly; manuscript sub-agents fix contradictions between
    the panel agents.
 7. **Agents run in the background.** Every agent Spell spawns — panel
-   reviewers, R, M, sub-agents, the high-level check, the auditor — is
+   reviewers, the promoter, R, M, sub-agents, the high-level check, the
+   auditor — is
    launched in the background and collected when its written artifact is
    ready; the orchestrator never blocks on a spawn.
-8. **Measure the panel.** Periodic auditor reads the ledgers (ritualism, gate
-   leakage, per-reviewer agreement); canary panels seed known-false claims to
-   measure detection. Record what you find.
+8. **Measure the panel.** Each run the auditor reads the ledgers (ritualism,
+   gate leakage, per-reviewer agreement, **premature kills** — ideas
+   rejected/`fail`ed/parked that later proved right: opinion-kills are a
+   protocol alarm, evidence-kills are correct behavior), evaluates the
+   **revival triggers** on demoted/archived ideas, and computes the
+   **idea-yield** metric (accepted claims + promoted ideas + new subgoals per
+   unit cost). A **canary panel** (seeded known-false claim) is mandatory once
+   per project, before the first normal-tier delivery. Record what you find.
 9. **Artifacts are files; the orchestrator guarantees them.** Every agent
-   that produces an artifact — panel reviewers, R, M, sub-agents, the
-   high-level check, the auditor — is spawned with an explicit output path,
+   that produces an artifact — panel reviewers, the promoter, R, M,
+   sub-agents, the high-level check, the auditor — is spawned with an
+   explicit output path,
    must write its artifact there, and must confirm the write in its final
    message. If the agent's environment is read-only or the write fails (a
    read-only sub-agent type, a sandboxed exterior `codex exec`), it must
@@ -130,22 +191,30 @@ Never end a session on failure; end on the next action.
    the record `recovered from agent output`. The orchestrator checks file
    existence after every agent completes and never starts the next phase on
    a missing artifact.
-10. **The chosen mode binds the round.** Round mode (normal/fast) is recorded
-    in the dossier at round start, before any agent spawns. A fast round runs
+10. **The chosen tier binds the round.** The tier (screening | fast | normal)
+    is recorded in the dossier at round start, before any agent spawns. A
+    screening round runs the claim-reviewer format only; a fast round runs
     exactly two agents — A and B — and never spawns the 5-agent panel (A1,
-    A2, X/A3, R, M) or runs phases A–F; a normal round runs the full panel.
-    If the user chose fast mode, spawning the panel is a protocol violation.
+    A2, X/A3, R, M, P) or runs phases A–F; a normal round runs the full panel
+    + promoter. If the user chose a cheaper tier, spawning the panel is a
+    protocol violation.
 
-## Review panel — 5 agents, phases A–F (normal mode)
+## Review panel — 5 agents + promoter, phases A–F (normal tier)
 A1 counterexample-hunter + A2 step-validator (internal) + **X** exterior
 independent (variables `X_PROVIDER` / `X_MODEL` / `X_ACCESS`; access =
 provider API env var or the local Codex CLI) — or internal **A3**
-architecture-critic when there is no X + R ranking + M manuscript.
+architecture-critic when there is no X + R ranking + M manuscript + **P**
+promoter (fresh context, alongside the panel): pushes the champion idea as
+far as it goes — the strongest honest version, the maximal true fragment,
+exactly where it breaks. Its outputs enter the ledger as `promising` /
+`claimed`; its own work never grades itself (invariant 1).
 
 A review → B exchange → C cross-review → D rebuttal → E ranking + close → F
-manuscript (follows the ranking; additions flagged `[new in manuscript]`,
-disagreements `[ranking deviation]`; must state how it improves the draft).
-All panel agents run in the background — A1 + A2 + X/A3 in parallel — their
+manuscript (surgical — patches only the sections the record changed; follows
+the ranking; additions flagged `[new in manuscript]`, disagreements `[ranking
+deviation]`; must state how it improves the draft).
+All panel agents run in the background — A1 + A2 + X/A3 in parallel, P
+alongside — their
 written artifacts collected in phase order (each agent is spawned with its
 artifact path in its prompt; see Invariant rule 9 for agents that cannot
 write). In Phase F, M also writes the
@@ -154,32 +223,47 @@ previous version (or vs the input for v1), each with a one-line context and
 an importance flag; important changes highlighted at the top.
 X unavailable → run with A1/A2 and record `X unavailable — reduced diversity`.
 
-After the panel, a **streamline agent (S)** (fresh context, in the
-background) streamlines the manuscript: extracts the core ideas, simplifies
-the proof, cuts redundancy — without changing mathematical content
-(substance-touching edits are flagged `[streamlined — check]` or left as
-suggestions). S appends its simplifications to the change list (context:
-streamlining); the high-level check runs on the streamlined manuscript.
+**Streamline folds into M.** M streamlines in the same pass — extracts the
+core ideas, simplifies the proof, cuts redundancy — without changing
+mathematical content (simplifications that would touch substance are flagged
+`[streamlined — check]` or left as suggestions with the original step
+intact); there is no standalone S phase. Ledgers grow as appendices; artifact
+size is monotone non-growing per round (a protocol alarm otherwise); the
+high-level check runs on the manuscript M produced.
 
-## Round mode — normal vs fast (ask at the start of every round)
-At the start of **every round — round 1 included** — ask the user: **normal
-mode** (the 5-agent panel, phases A–F, above) or **fast mode** (the 2-agent
-loop below)? Record the choice in the dossier (`mode: normal | fast` in the
-Panel & check ledger) **before any agent spawns**, and follow it for the
-whole round.
+## Round tier — screening | fast | normal (proposed at round start, user may override)
+At the start of **every round — round 1 included** — the orchestrator proposes
+the tier from the round type; the user may override. Record the choice in the
+dossier (`tier: screening | fast | normal` in the Panel & check ledger)
+**before any agent spawns**, and follow it for the whole round.
+- **screening** — per-claim review in the claim-reviewer format
+  (`modules/prompts.md` §1) on every claim nominated for the verification
+  pipeline; default for exploratory rounds; no manuscript is produced.
+- **fast** — the 2-agent A/B loop (below); default for negative and
+  repair-scoped rounds (repair escalates to normal only when a listed
+  condition is load-bearing); skips the panel and the high-level check.
+- **normal** — the 5-agent panel + promoter (phases A–F) + high-level check;
+  required only for load-bearing or manuscript-bound claims.
 
-**In a fast round, the 5-agent panel is NOT run.** Phases A–F do not exist in
-a fast round: do not spawn A1, A2, X/A3, R, or M, do not write their prompts,
-and do not collect their artifacts. The panel section above applies to normal
-mode only. A fast round runs exactly two agents:
+A **negative round** delivers a **negative-value assessment** in every tier —
+it replaces the high-level check for negative outcomes, it is not a form of
+it. A **repair-scoped round** fixes only the listed conditions of a
+`conditional` verdict — scope frozen (no new conjectures), re-check only
+those conditions, artifact not re-derived — and runs the cheapest tier that
+can check them. `conditional` is always a user decision point (repair / park
+/ re-scope), never an automatic continue.
+
+**In a screening or fast round, the 5-agent panel is NOT run.** Phases A–F do
+not exist in those rounds: do not spawn A1, A2, X/A3, R, M, or P, do not write
+their prompts, and do not collect their artifacts. The panel section above
+applies to normal tier only. A fast round runs exactly two agents:
 - Round 1 — **A** writes the draft (a manuscript input skips the draft); **B**
   attacks it in the background; when
   B's attack arrives, A rebuts and writes the manuscript + change list.
 - Rounds N ≥ 2 — **A** attacks the received manuscript; **B** attacks A's
   attack; A rebuts and writes the next manuscript + change list.
-The round then continues with the streamline step. **Fast mode skips the
-high-level check** — it is the normal-mode gate; a fast round delivers
-after streamlining. Fast mode trades review independence for speed — the
+**Fast mode skips the high-level check** — it is the normal-tier gate; a fast
+round delivers after M. Fast mode trades review independence for speed — the
 author attacks its own artifact, no exterior reviewer, no ranking, no
 high-level gate — so every fast round is marked `fast mode` in the ledger
 and its outputs carry a confidence downgrade.
@@ -187,11 +271,18 @@ and its outputs carry a confidence downgrade.
 ## High-level check
 Independent gate before delivery: **novelty** (`novel` / `extension` /
 `known`) + **sufficiency** (`within reach` / `plausible` / `beyond reach`)
-→ `pass` (deliver) / `conditional` (back to loop with targets) / `fail`
-(reformulate or park). Strategic gate, not a certificate. **Normal mode
-only — fast rounds skip the check and deliver after streamlining.** The
-check agent must write its report to a file and confirm the write; a
-read-only check agent delivers the report text in its final message and the
+→ `pass` (deliver) / `conditional` (user decision: repair / park / re-scope —
+never an automatic continue) / `fail` (demote + attach revival triggers).
+**Non-terminal routing:** no verdict auto-parks a thread — `fail` and
+"misdirected" demote the direction and attach revival triggers ("re-examine
+when <event>"); the only terminal state for an idea is a **demonstrated
+counterexample with a reproducible computation**, and every terminal verdict
+deposits its fragments into the wild-ideas register (fragments rule: maximal
+true subcase, obstruction, closest technique). Strategic gate, not a
+certificate. **Normal tier only — screening and fast rounds skip the check;
+negative rounds replace it with the negative-value assessment.** The check
+agent must write its report to a file and confirm the write; a read-only
+check agent delivers the report text in its final message and the
 orchestrator persists it verbatim (Invariant rule 9).
 
 ## Layout

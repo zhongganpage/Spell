@@ -14,9 +14,11 @@ internal harness's weights and blind spots.
 | `X_ACCESS` | how X is reached | `api` (HTTP API) · `codex` (local Codex CLI) |
 
 Current default (decided 2026-08-07): `X_PROVIDER=kimi`, `X_MODEL=k2.7`,
-`X_ACCESS=api` (key in `MOONSHOT_API_KEY`). Codex is pre-installed on this
-machine (`codex exec`), so `X_PROVIDER=openai`, `X_ACCESS=codex` needs no
-API key.
+`X_ACCESS=api` (key in `MOONSHOT_API_KEY`). This default is recommended:
+the API has no sandbox issues — codex's read-only sandbox cannot block a
+plain HTTP call — and is used unless codex is actually required. Codex is
+pre-installed on this machine (`codex exec`), so `X_PROVIDER=openai`,
+`X_ACCESS=codex` needs no API key.
 
 ## Access modes
 
@@ -26,10 +28,14 @@ API key.
 - **`codex`** — the locally installed OpenAI Codex CLI: invoke X as
   `codex exec "<phase prompt>"` and capture the reply as the written
   artifact. Authenticates through Codex's own login or `OPENAI_API_KEY`;
-  `X_MODEL` is whatever Codex is configured to use. **Codex may run in a
-  read-only sandbox** (`sandbox_mode: read-only`, approval `never`) that
-  blocks file writes — then stdout is the artifact: persist it at the
-  assigned path and mark the record `recovered from agent output`.
+  `X_MODEL` is whatever Codex is configured to use. Prefer a **writable
+  output dir** for `codex exec`; **Codex may run in a read-only sandbox**
+  (`sandbox_mode: read-only`, approval `never`) that blocks file writes —
+  then stdout is the artifact: delimit it with **standardized markers**,
+  persist it at the assigned path, and mark the record `recovered from
+  agent output`. The phase prompt asks for a **summary + inline reports**
+  rather than the full artifact, so the reply stays small and codex does
+  not re-read a 50–100 KB artifact to echo it.
 
 Credentials are never written into the dossier, a report, or any record.
 
@@ -55,10 +61,23 @@ common conventions). "Aggregators" expose many models behind one key.
 | Llama | Meta | Llama 3/4 | via aggregators (`GROQ_API_KEY` · `TOGETHER_API_KEY`) |
 | Aggregators | OpenRouter · Groq · Together | many models | `OPENROUTER_API_KEY` · `GROQ_API_KEY` · `TOGETHER_API_KEY` |
 
+## Diversity enforcement
+
+At startup — as part of the very first configuration question — the
+harness verifies that `X_MODEL` is **not the same provider family as the
+internal harness** (one-line check, non-negotiable). If it is, or if X is
+unavailable, the run is auto-labeled `reduced diversity` with a confidence
+downgrade. The panel row records **which models actually ran per role**
+(A1, A2, X — or A3 in place of X), so a same-family or absent X is always
+visible; there is no silent same-model panel.
+
 ## Availability
 
 X participates in all phases (A–D) in the same formats as A1 and A2. If X
-cannot be reached at panel start, the panel proceeds with A1 and A2 alone;
-the run records `X unavailable — reduced diversity` in the panel ledger and
-the manuscript carries the same mark. If X fails mid-run, its written
-artifacts up to the failure point stand.
+cannot be reached at panel start — or never launched — the third reviewer
+slot is filled by an internal agent **A3** and the panel runs A1, A2, A3,
+each with an explicit role; X's absence is recorded as a ledger event
+(including `never launched`), the run is auto-labeled `reduced diversity`
+with a confidence downgrade (see "Diversity enforcement"), and the
+manuscript carries the same mark. If X fails mid-run, its written artifacts
+up to the failure point stand.

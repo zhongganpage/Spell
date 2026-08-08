@@ -30,7 +30,14 @@ Run these moves *mechanically*; each move, even a failed one, is recorded.
   monotonicity that makes a limiting argument work?
 - **M10 — Computational experiments.** Brute force over small ranges, random
   search for counterexamples, symbolic tests (OEIS, a CAS). Experiments
-  inform; they never substitute for a proof.
+  inform; they never substitute for a proof. **Numerics guardrail:** every
+  numerical claim embeds an exact-case reproduction (a ≡ const, d=1, a 2×2
+  model) in the script — the a ≡ const check alone exposes a wrong
+  t-dependence; load-bearing numbers need **two independent scripts**;
+  **role separation** — the agent that builds the theory is not the agent
+  that writes the verification scripts. All agents must cite the shared,
+  versioned norms/solver file; the notation lock is enforced, not just
+  claimed.
 - **M11 — Literature triangulation.** For every reformulation, search its
   terminology. Find the nearest known theorem and read its proof *fully* —
   adapted, not cited. Check specifically whether the claim (or its negation)
@@ -47,6 +54,11 @@ Run these moves *mechanically*; each move, even a failed one, is recorded.
 
 A thread is stalled when two consecutive sessions on it produced no progress.
 Escalate in order; you may not skip a rung:
+
+**GAP-owner discipline.** One thread owns one GAP across multiple rounds,
+attacking it from different angles — each angle recorded — until the floor
+rung is reached; targets change only at a floor verdict. The portfolio
+reserves the champion share for the GAP-owner (`definition.md`, "GAP-owner").
 
 1. **Untried moves.** Run the toolkit moves you have not yet tried (keep a
    tick list per thread).

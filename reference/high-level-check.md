@@ -10,14 +10,26 @@ answers two high-level questions about the input draft or manuscript:
 It deliberately does **not** check the line-by-line correctness of the proof;
 that is the review panel's adversarial job and the verification ledger's job.
 
+Its verdict is **descriptive routing** — to the next verification depth
+(`screening → panel → formalization`) or to the user — never a certificate
+(`depth escalation` in `definition.md`). On negative rounds the check is
+replaced by the **negative-value assessment**
+(§ "Negative rounds — the negative-value assessment").
+
 ## When it runs
 
 - **Required** on every manuscript in **normal mode**, before delivery —
-  after the **streamline step** (`review-panel.md`): the check receives the
-  streamlined manuscript and its change list (the change list records what
-  the streamline agent changed). **Fast mode skips the check** — a fast
-  round delivers after streamlining, with the fast-mode confidence
+  after the manuscript pass (**streamline folded into M**; `review-panel.md`):
+  the check receives the surgical manuscript and its change list (the change
+  list records what M changed). **Fast mode skips the check** — a fast round
+  delivers after the manuscript pass, with the fast-mode confidence
   downgrade.
+- **Replaced on negative rounds.** A negative round does not run the
+  high-level check at all; its outcome is delivered as a **negative-value
+  assessment** (§ "Negative rounds — the negative-value assessment"),
+  produced by a dedicated cheap agent that runs in **all tiers** — fast and
+  screening rounds do not skip it. It replaces the check for negative
+  outcomes; it is not a form of it.
 - **Optional** on an early draft, as a triage check — catching "this is
   already known" or "this cannot possibly work" before expensive panel time
   is spent.
@@ -58,7 +70,9 @@ and version it judged (e.g. `manuscript v1`). The check agent must write the
 report to the assigned file and confirm the write in its final message; a
 read-only check agent (or a write-blocked sandbox) delivers the report text
 in its final message and the orchestrator persists it verbatim
-(`protocol.md` §9).
+(`protocol.md` §9). A `fail` report must also name the **revival triggers**
+it attaches — the `re-examine when <event>` conditions (§ "Decision
+routing").
 
 ### Novelty
 
@@ -82,23 +96,69 @@ at most `conditional`.
 
 ### Overall
 
-- `pass` — novel and within reach: the document may be delivered.
+- `pass` — novel and within reach: the document routes forward (delivery to
+  the user; its surviving claims to the next verification depth).
 - `conditional` — viable idea, but novelty or reach is unclear or shaky:
   list exactly what must be established first.
 - `fail` — known, or beyond reach, or the high-level architecture does not
-  support the claim: say why in three sentences or fewer.
+  support the claim: say why in three sentences or fewer, and name the
+  revival triggers (the `re-examine when <event>` conditions).
+
+A verdict is **descriptive routing**, never a certificate: it routes to the
+next verification depth (`screening → panel → formalization`) or to the
+user — a `pass` routes forward, it does not certify the mathematics.
 
 ## Decision routing
 
 | Overall | Route |
 |---|---|
-| `pass` | Deliver the manuscript. |
-| `conditional` | Return to the working loop with the listed targets; the revised artifact is a new **draft** (the panel runs again). |
-| `fail` | Return to the working loop with the reason: the idea is reformulated (novelty/architecture failure) or parked in the dossier (reach failure). |
+| `pass` | Routes forward: the manuscript is delivered to the user, and its surviving claims move to the next verification depth (`screening → panel → formalization`). |
+| `conditional` | A **user decision point**, never an automatic continue: the user chooses **repair** (scope frozen — fix the listed conditions only, no new conjectures; re-check only those; the artifact is not re-derived), **park**, or **re-scope**. |
+| `fail` | **Demotes** the direction (portfolio rank down) and attaches **revival triggers** ("re-examine when <event>", wired to the literature watch list and new dossier evidence); the report names them. |
 
-A failed or conditional manuscript is **not** delivered and **not** silently
-kept as a manuscript: the downgrade to draft, and the reason, are recorded in
-the verification ledger as a dated event.
+No verdict auto-parks a thread: the old automatic "reformulate or park"
+routing is removed. **Parking is an explicit user decision** — and even then
+the fragments rule applies. The panel's `misdirected` verdict demotes and
+attaches revival triggers the same way (`review-panel.md`).
+
+**The only terminal state for an idea is a demonstrated counterexample with
+a reproducible computation.** Under the **fragments rule**, every terminal
+verdict — a counterexample or an evidence-backed rejection — deposits the
+maximal true subcase, the obstruction, and the closest technique into the
+wild-ideas register, with revival triggers.
+
+A `fail`ed or `conditional` manuscript is **not** delivered and **not**
+silently kept as a manuscript: whatever the user decides next — repair,
+park, re-scope, or re-entry into the working loop — the disposition and its
+reason are recorded in the verification ledger as a dated event.
+
+## Negative rounds — the negative-value assessment
+
+A negative round's deliverable is a **negative-value assessment**: did we
+truly rule out the direction, or did the tool just fail? It is produced by a
+**dedicated cheap agent** that runs in **all tiers** — fast and screening
+rounds do not skip it. For negative outcomes it **replaces** the high-level
+check; it is not a form of it.
+
+Its job is to **assess — never certify** — the evidence quality of the
+rule-out, weighing exactly what stands behind it:
+
+- **exact cases** — reproduced exact-case computations;
+- **fetched literature** — fetched, locator-carrying sources;
+- **verified computation** — reproducible scripts, with role separation for
+  load-bearing numbers (the numerics guardrail).
+
+Verdicts:
+
+- `ruled-out-with-evidence` — the direction is dead, and the evidence
+  (exact cases, fetched literature, verified computation) stands.
+- `tool-failure` — the rule-out is not established: the tool failed, so the
+  direction remains open.
+
+A rule-out with assessed evidence is a **first-class deliverable** (the
+negative round delivers it instead of a manuscript) and is recorded in the
+**wild-ideas register** under the fragments rule: the maximal true subcase,
+the obstruction, and the closest technique, each with revival triggers.
 
 ## Interaction with verification
 
@@ -107,3 +167,8 @@ a `pass` manuscript contains claims that remain `claimed`/`under-review`
 until the independent verification session accepts them. The check never
 overrides a rejected claim, and a `fail` never depends on a single step —
 only on the idea's novelty and reach.
+
+Verification depth is per-claim and non-decreasing across rounds
+(`screening → panel → formalization`): a claim that survives round N is not
+re-checked at the same depth in round N+1. The gate's verdict routes to the
+next depth or to the user — it never certifies.

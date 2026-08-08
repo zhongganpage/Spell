@@ -29,6 +29,8 @@ The panel consists of **five agents**:
   the panel (Phase E).
 - **One manuscript agent** (M) — writes the manuscript from the ranking
   (Phase F). M is a different agent from R.
+- **The promoter** — a fresh-context agent alongside the panel, not one of
+  the five panel agents; described under "The promoter" below.
 
 Independence rules (non-negotiable):
 
@@ -44,12 +46,14 @@ Independence rules (non-negotiable):
    internal agents, use it; at minimum, a fresh context window.
 5. The three panel reviewers communicate only through written records, in the
    exact sequence of the phases below. R and M each enter once, read the
-   record, write their artifact, and close.
+   record, write their artifact, and close. The promoter reads the same
+   records and writes its note without any interaction with the reviewers.
 6. **Role diversity is enforced.** A1 is the counterexample hunter, A2 the
    step validator, and the third slot is X (independent exterior reviewer) or
    A3 (architecture critic) when there is no X. When X is unavailable, the
-   run records `X unavailable — reduced diversity` and a **confidence
-   downgrade** on the panel row.
+   run records `X unavailable — reduced diversity`; when `X_MODEL` is the
+   same provider family as the internal harness, it records `reduced
+   diversity`. Either way the panel row carries a **confidence downgrade**.
 7. **Reviewers read verbatim inputs.** Definitions and cited statements are
    copied from the dossier's locked sections; any restatement by the author
    is flagged `[restated]` and may be rejected by a reviewer.
@@ -133,6 +137,31 @@ the very first startup question (`protocol.md` §10):
   (`protocol.md` §8). If X fails mid-run, the written artifacts it produced
   up to the failure point stand, and the ledger records the partial
   participation.
+- **Diversity enforcement.** At startup the harness verifies that `X_MODEL`
+  is not the same provider family as the internal harness. If it is — or X
+  is unavailable — the run is auto-labeled `reduced diversity` with a
+  confidence downgrade. One-line check, non-negotiable; the auto-label and
+  the downgrade are recorded in the panel ledger and carried on the
+  manuscript.
+- **Orchestration checklist.** A1 + A2 + X are launched in parallel; every
+  artifact's existence is confirmed before the next phase starts; and X's
+  absence — including "never launched" — is recorded as a ledger event. An
+  absent or same-family X is always flagged; there is no silent same-model
+  panel.
+
+### The promoter
+
+The **promoter** is a fresh-context agent that runs alongside the panel (in
+manuscript-bound rounds) and pushes the champion idea as far as it goes: the
+strongest honest version, the maximal true fragment, exactly where it breaks,
+and what the break implies the true statement must be. The mirror of the
+attacker; the role most likely to find the proof. It reads the same written
+records as the panel — the input artifact, the definitions, and the locked
+problem statement — and writes its **"nearest true version" note**, which
+enters the ledger as `promising`/`claimed`. The promoter's own work never
+grades itself (invariant 1), and it is not one of the five panel agents: it
+does not vote, rank, or rebut. Every manuscript-bound round includes its
+note.
 
 ## Inputs and outputs
 
@@ -143,13 +172,19 @@ the very first startup question (`protocol.md` §10):
   locked problem statement (`Q` vN) are attached.
 - **Output:** one manuscript of the next version, its **change list**
   (`changelog-vN.md`), plus the full written record — 3 review reports, 3
-  cross-judgements, 3 rebuttals, 1 ranking — kept in the dossier. All panel
-  artifacts carry versions.
+  cross-judgements, 3 rebuttals (or, on an agreeing panel, 3 combined
+  responses under the adaptive depth rule), 1 ranking, 1 **idea scoreboard**,
+  and the promoter's "nearest true version" note — kept in the dossier. All
+  panel artifacts carry versions.
 
 ## The phases
 
 All phases are sequential and written: every artifact is a document the next
-phase can read. Nothing that is not recorded may be transmitted.
+phase can read. Nothing that is not recorded may be transmitted. The
+**hygiene linter** (`definition.md`) is a deterministic mechanical pass, not
+a reviewer; it runs before any review phase and before delivery, in all
+tiers — the input artifact is linted before Phase A, and the manuscript
+output is linted before it is delivered.
 
 ### Phase A — Independent review of the input artifact
 
@@ -192,6 +227,16 @@ Each agent receives the other two review reports. This phase exists to make
 the hand-off explicit and to prevent premature closing; nothing else happens
 in it.
 
+**Adaptive phase depth.** When the three Phase-A verdicts are within one
+category (all accept / all repairable / all misdirected), the full
+B exchange → C cross-review → D rebuttal sequence collapses into a **single
+combined response exchange**: each reviewer answers the other two once, in
+one written response, and Phases C and D below are skipped. When the verdicts
+genuinely conflict, the full B/C/D sequence runs. Records are never merged —
+every position change stays verbatim, so the retraction discipline survives
+the collapse. An agreeing panel's written record is 3 review reports + 3
+combined responses, not a consensus document.
+
 ### Phase C — Cross-review
 
 Each agent reviews the other two review reports with the same critical
@@ -214,16 +259,23 @@ accepted — the ranking agent rejects it in Phase E.
 
 A **new agent, the ranking agent R**, enters with fresh context and reads
 the entire record: the draft, the three review reports, the three
-cross-judgements, and the three rebuttals.
+cross-judgements, and the three rebuttals (or the three combined responses,
+on an agreeing panel under the adaptive depth rule).
 
-R does two things:
+R does three things:
 
-1. **Ranks** the persuasive, interesting, and/or helpful ideas and arguments
-   in the record — the ones the manuscript must be built on — each with one
-   line on why it earned its rank. Discarded ideas are listed with their
-   reason; nothing is silently dropped.
-2. **Closes the three panel agents.** After they have finished their
-   rebuttals, R terminates them. No further communication with the panel.
+1. **Ranks the ideas that are promising-for-the-goal** — not "persuasive"
+   (persuasiveness is a consensus detector, not a value ranking). Each
+   finding carries a **provenance tag**: `Phase A independent` (the reviewer
+   reached it on its own) vs. `echoed` (it repeats another report). Unique
+   catches and independent agreement outrank consensus echoes. Each ranked
+   idea carries one line on why it earned its rank; discarded ideas are
+   listed with their reason; nothing is silently dropped.
+2. **Emits the idea scoreboard.** Each candidate idea is rated
+   promise × reach ÷ cost, alongside the ranking.
+3. **Closes the three panel agents.** After they have finished their
+   rebuttals (or their combined responses), R terminates them. No further
+   communication with the panel.
 
 R's ranking is a written artifact: the ordered list with justifications and
 the explicit discard list. R does **not** write the manuscript; that is a
@@ -232,10 +284,10 @@ separate agent's job (Phase F).
 ### Phase F — The manuscript
 
 A **new agent, the manuscript agent M** (separate from R), enters with fresh
-context and receives the locked problem statement, the ranking, the full
-record (draft, reports, cross-judgements, rebuttals), and the artifact to
-diff against — the previous manuscript version, or the input artifact for v1.
-M writes the **manuscript**, under these obligations:
+context and receives the locked problem statement, the ranking, the idea
+scoreboard, the full record (draft, reports, cross-judgements, rebuttals),
+and the artifact to diff against — the previous manuscript version, or the
+input artifact for v1. M writes the **manuscript**, under these obligations:
 
 1. **Faithfulness.** The ranking is the blueprint: every ranked idea appears
    in its ranked priority, and every mathematical assertion in the manuscript
@@ -245,38 +297,60 @@ M writes the **manuscript**, under these obligations:
    be treated as established.
 2. **Resolution of every criticism.** Every `gap`/`flaw`/`false` item from
    the records is either repaired in the manuscript, explicitly dismissed
-   with the reason, or carried forward as an open item.
-3. **Delegation and contradiction repair.** M may spawn sub-agents for
+   with the reason, or carried forward as an open item. Entries in the
+   `[speculative developments]` appendix (obligation 11) are the one
+   exception: they are flagged, not resolved-by-force — speculative content
+   only, and the exemption never covers load-bearing claims.
+3. **Surgical by default.** M patches only the sections the record changed
+   (diff-scoped) instead of rewriting the full document; ledgers grow as
+   appendices rather than being rewritten. Artifact size is monotone
+   non-growing per round — a violation is a protocol alarm.
+4. **Streamlining, in the same pass.** The streamline step is folded into M
+   (§ "The streamline step (folded into M)"): state the main theorem and the
+   proof skeleton plainly at the top, cut redundancy and dead ends, reorder
+   for clarity — **never changing the mathematical content**. A
+   simplification that would touch substance is flagged `[streamlined —
+   check]` and kept out of the critical path, or left as a suggestion with
+   the original step intact. Every material simplification is appended to
+   `changelog-vN.md` with context "streamlining"; if nothing needs
+   simplifying, M says so.
+5. **Delegation and contradiction repair.** M may spawn sub-agents for
    tedious work (`protocol.md` §5.1). Its sub-agents do not merely record the
    contradictions between the panel agents — the review reports,
    cross-judgements, and rebuttals — they attempt to fix them: verify the
    disputed claim, repair the gap, or determine which side is right. What
    cannot be fixed is recorded honestly as an open item with the reason.
-4. **Ranking deviations are visible.** If M disagrees with an item in R's
+6. **Ranking deviations are visible.** If M disagrees with an item in R's
    ranking, it does not silently drop it: the manuscript flags the
    disagreement `[ranking deviation]` with a reason, so the user can audit.
-5. **Improvement remarks.** A dedicated section, "How this manuscript
+7. **Improvement remarks.** A dedicated section, "How this manuscript
    improves on the initial artifact (draft vN / input manuscript vM)",
    listing the concrete improvements: which gaps were closed, which ideas
    were promoted, which attacks were rebutted.
-6. **Version.** The manuscript carries its own version (`v1`, `v2`, …); the
+8. **Version.** The manuscript carries its own version (`v1`, `v2`, …); the
    panel ledger row records the artifact version it was built from and the
    manuscript version it produced.
-7. **Form.** The manuscript is written in the project's chosen output form.
-8. **Change list.** Alongside the manuscript, M writes `changelog-vN.md` (in
-   the internal record format): every material change vs the previous
-   manuscript version (or vs the artifact this manuscript improves on, for
-   v1), each entry with a one-line context (which review finding / ranking
-   item / repair drove it) and an importance flag (`high` / `medium` /
-   `low`); the `high` changes are repeated at the top as a highlighted "Key
-   changes" list. The change list is a brief audit aid, not a full diff.
+9. **Form.** The manuscript is written in the project's chosen output form.
+10. **Change list.** Alongside the manuscript, M writes `changelog-vN.md` (in
+    the internal record format): every material change vs the previous
+    manuscript version (or vs the artifact this manuscript improves on, for
+    v1), each entry with a one-line context (which review finding / ranking
+    item / repair / streamlining drove it) and an importance flag (`high` /
+    `medium` / `low`); the `high` changes are repeated at the top as a
+    highlighted "Key changes" list. The change list is a brief audit aid, not
+    a full diff.
+11. **Speculative developments appendix.** M may carry a `[speculative
+    developments]` appendix whose entries are flagged `[speculative]` —
+    promising but unestablished material from the record — and are exempt
+    from obligation 2's "every gap resolved" requirement. Speculative content
+    only; the exemption never covers load-bearing claims.
 
 ## After the panel
 
 The manuscript and its change list (`changelog-vN.md`) are handed to the
-**streamline step** (§ below) and then, in normal mode, to the
-**high-level check** (`high-level-check.md`); fast rounds skip the check and
-deliver after streamlining. The panel ledger row records both versions. It
+**high-level check** (`high-level-check.md`) in normal mode; fast rounds skip
+the check and deliver. In all tiers the **hygiene linter** runs on the
+manuscript before delivery. The panel ledger row records both versions. It
 is not yet delivered, and it is not yet "established": its claims enter the
 verification ledger like any other claim.
 
@@ -285,12 +359,15 @@ Phase-A "suggested next attacks" and R's ranking are appended verbatim to the
 dossier's Open Threads, so the best research advice the system generates
 informs the next working-loop session, not only the manuscript agent.
 
-## The streamline step
+## The streamline step (folded into M)
 
-A **streamline agent (S)** — a single new agent with fresh context, run in
-the background — sits between the manuscript (Phase F) and the high-level
-check. S receives the manuscript and its change list and tries to
-**streamline** it:
+There is **no standalone streamline agent (S)**. As of 2026-08-08 the
+streamline step is folded into the manuscript agent (M) and runs inside
+Phase F, in the same pass as the surgical patch (obligation 4): the
+manuscript writer streamlines the manuscript it is writing. There is no S
+phase and no S row in the panel ledger.
+
+M streamlines while writing:
 
 1. **Extract the core ideas.** State the main theorem and the proof skeleton
    plainly at the top; make the architecture of the argument visible.
@@ -303,22 +380,22 @@ check. S receives the manuscript and its change list and tries to
    the original step intact.
 4. **Append to the change list.** Every material simplification is appended
    to `changelog-vN.md` with context "streamlining" and an importance flag.
-5. **Version.** The streamlined manuscript keeps the version of the
-   manuscript it streamlines; the ledger records `S:ok`. If nothing needs
-   simplifying, S says so and passes the manuscript through unchanged.
+5. **Version.** The manuscript keeps the version M wrote for it; the
+   streamlining is recorded as part of M's panel ledger row. If nothing needs
+   simplifying, M says so in its final message and passes the manuscript
+   through unchanged.
 
-In normal mode the high-level check runs on the streamlined manuscript; in
-fast mode the round delivers after streamlining (no check). The streamline
-step is a conservative edit: it improves presentation and focus, never the
-claim.
+The streamline step is a conservative edit folded into the manuscript pass:
+it improves presentation and focus, never the claim.
 
 ## Fast mode
 
 At the start of each round the user chooses **normal mode** (the 5-agent
 panel, phases A–F) or **fast mode** — a 2-agent adversarial loop that
 replaces the panel for that round. **In a fast round the 5-agent panel does
-not run at all:** A1, A2, X/A3, R, and M are not spawned and phases A–F do
-not occur; the round's panel work is exactly the two-agent loop below:
+not run at all:** A1, A2, X/A3, R, M, and the promoter are not spawned and
+phases A–F do not occur; the round's panel work is exactly the two-agent loop
+below:
 
 - **Round 1.** Agent **A** writes the draft (high-level; tedious work
   delegated per `protocol.md` §5.1). A **manuscript input** skips the draft —
@@ -333,9 +410,13 @@ not occur; the round's panel work is exactly the two-agent loop below:
   rebuts** B's critique of its attack and writes the next manuscript + change
   list.
 
-The round then continues with the streamline step; **the high-level check
-is skipped in fast mode** (it is the normal-mode gate) and the round
-delivers after streamlining. Versioning, the change list, question.md
+The round then continues with the **hygiene linter**, which runs on the
+manuscript before delivery in all tiers; **the high-level check is skipped in
+fast mode** (it is the normal-mode gate) and the round delivers after the
+linter. There is no standalone streamline step here either — the streamline
+obligations (Phase F, obligation 4) fold into the fast-mode manuscript pass,
+so the manuscript writer streamlines in the same pass that produces the
+manuscript and its change list. Versioning, the change list, question.md
 subgoals, and round timing apply unchanged.
 
 **Why it is marked, not certified.** Fast mode trades review independence for
@@ -357,17 +438,25 @@ prompts: `modules/prompts.md` §9–10.)
   spots.
 - **Faithless ranking** — R ranking by whim rather than by the record.
   Countered by the requirement that every ranked item carries a justification
-  and every discard a reason; the user can audit R's ranking against the
-  record.
+  and every discard a reason; the provenance tags (`Phase A independent` vs.
+  `echoed`) let the user audit where each ranked finding came from.
 - **Faithless writing** — M ignoring the ranking and the record and rewriting
   from scratch. Countered by Phase F obligations 1 and 2; the user can audit
   M against the ranking and the record.
 - **Ranker–writer drift** — M silently deviating from R's ranking. Countered
   by the `[ranking deviation]` flag, which makes disagreements visible rather
   than silent.
-- **Silent degradation** — the panel proceeding without X and nobody
-  recording it. Countered by the mandatory `X unavailable — reduced
-  diversity` ledger entry and the same mark on the manuscript.
+- **Streamline drift** — M simplifying past the mathematical content.
+  Countered by the rule that a simplification touching substance is flagged
+  `[streamlined — check]` and kept out of the critical path, or left as a
+  suggestion with the original step intact.
+- **Silent degradation** — the panel proceeding without X, or with a
+  same-family X, and nobody recording it. Countered by the startup diversity
+  check (a same-family or absent X auto-labels the run `reduced diversity`
+  with a confidence downgrade), the mandatory `X unavailable — reduced
+  diversity` ledger entry and the same mark on the manuscript, and the
+  orchestration checklist that records any X absence — including "never
+  launched" — as a ledger event.
 - **Exterior-agent drift** — the provider returning a different model than
   configured. Countered by recording the actual model identifier reported by
   the provider in each run's panel row.
