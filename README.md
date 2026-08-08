@@ -4,9 +4,7 @@ Spell is a **universal proof enhancement protocol** based on adversarial
 multi-agent review procedures. You can use it on ANY agentic systems such as
 Claude Code, CodeX, Kimi Code and etc. Every round runs in **normal mode**
 (5-agent panel, phases A–F, plus the high-level check) or **fast mode** (a
-2-agent A/B attack/rebut loop that skips the high-level check), and is timed
-automatically — the round time with its phase breakdown is shown at the end
-of every round in every mode. My personal experience is that for
+2-agent A/B attack/rebut loop that skips the high-level check). My personal experience is that for
 Kimi Code + Deepseek-v4-flash, it will output a fine manuscript within 2
 hours and the cost is less than 1 US dollar. Have fun :)
 
