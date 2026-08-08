@@ -36,6 +36,10 @@ you decide between them.
 
 ## How it works
 
+**First round, normal mode** — the 5-agent panel (A1, A2, X/A3, R, M;
+phases A–F) reviews the draft, and the high-level check gates delivery
+(`pass` → deliver; `conditional` / `fail` → back to the working loop).
+
 ```
 rough idea ────────────────┐
 manuscript (input) ────────┤
@@ -45,26 +49,13 @@ manuscript (input) ────────┤
    │ no                    │
    ▼                       │
 working loop ────► draft ──┴──► review panel ──► manuscript (+ change list)
-   ▲                    │
-   └────────────────────┘        per-round mode, asked at the start of
-        (fail / conditional       each round:
-         → back to the loop)      · normal — 5-agent panel, phases A–F
-                                  · fast — 2-agent A/B attack/rebut loop
                                      │
                                      ▼
                               streamline (agent S)
                                      │
-                        ┌────────────┴────────────┐
-                        ▼                         ▼
-                   normal mode               fast mode
-                        │                         │
-                        ▼                         │
-             high-level check (novelty +         │
-             sufficiency): pass → deliver;       │
-             conditional / fail → back to        │
-             the working loop                    │
-                        │                         │
-                        └────────────┬────────────┘
+                                     ▼
+                       high-level check (novelty + sufficiency)
+                                     │
                                      ▼
                            deliverable + decisions
                                      │
