@@ -1,4 +1,4 @@
-# Spell — An Adversarial Multi-Agent Cross-Review Proof Generation Protocol
+# Spell — An Adversarial Cross-Review Proof Generation Protocol
 
 Spell is a **universal proof enhancement protocol** based on adversarial
 multi-agent cross-review procedures. You can use it on ANY agentic systems such as
