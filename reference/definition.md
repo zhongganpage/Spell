@@ -68,9 +68,12 @@ Properties of a draft:
 - It is one agent's snapshot — not a consensus, not a final product.
 - A project may produce many drafts; each is produced independently by a
   single agent at a single time, and each carries a version (`v1`, `v2`, …).
-- It is high-level by design: massive or tedious work is delegated to
-  sub-agents and only its outcomes appear in the draft; the details live in
-  the dossier (`protocol.md` §5.1).
+- It is planned in advance and integrated: the author decomposes the work
+  into tasks, distributes them — massive or tedious work goes to background
+  sub-agents (mandatory, `protocol.md` §5.1), small tasks the author does
+  itself — collects and reconciles every result before finishing, and only
+  the integrated outcomes appear in the draft; the details live in the
+  dossier's delegated-task entries.
 - It carries a short "what was tried and failed" section — the run's dead
   ends are visible to the panel, not laundered.
 - Promising-based heuristics may appear in a draft, explicitly labeled
@@ -94,8 +97,10 @@ Properties of a manuscript:
   alarm otherwise). See "surgical manuscript".
 - It must state, in its own remarks, how the current argument improves on the
   initial artifact (the draft, or the input manuscript).
-- Its writer may delegate tedious work to sub-agents, which not only record
-  but attempt to fix contradictions between the panel agents
+- Its writer (M) is a **planner**: it plans the manuscript's work in
+  advance, distributes it — massive or tedious tasks go to background
+  sub-agents (mandatory, `protocol.md` §5.1) — and its sub-agents not only
+  record but attempt to fix contradictions between the panel agents
   (`protocol.md` §5.1).
 - It may carry a `[speculative developments]` appendix whose entries are
   flagged and exempt from the "every gap must be resolved" obligation
@@ -295,7 +300,7 @@ against the manuscript's own tables and the notation lock. Not a reviewer —
 it is a linter/script.
 
 ### idea sprint
-A parallel phase at round start, **hard-capped at 10 minutes wall-clock**
+A parallel phase at round start, **hard-capped at 30 minutes wall-clock**
 (measured by the orchestrator from sprint start; collection cut off at the
 mark; late artifacts discarded and recorded `sprint overrun — discarded`):
 3–5 **explorer agents** — specialize/edge-case miner, reformulation hunter (M5),
@@ -303,9 +308,19 @@ analogy/transfer agent (reads the obstructions register and the literature
 map; evaluates revival triggers), wildcard — plus a **recombination agent**
 that pairs unrelated dossier entries (two reformulations; an obstruction + a
 partial result; an idea + a technique that worked elsewhere). Each candidate
-returns with the cheapest discriminating test. The sprint feeds the GAP-owner;
+returns with the cheapest discriminating test where one exists — the field
+is optional, and dead ends and partial leads count. The sprint feeds the GAP-owner;
 it does not open new target queues. All candidates — survivors and discards —
-enter the wild-ideas register.
+enter the wild-ideas register; survivors also form the round's **sprint
+backlog** — the top of the attack queue (§4).
+
+### sprint backlog
+The round's sprint survivors, each carrying its cheapest discriminating
+test, ranked at the top of the attack queue; the working loop draws from it
+before free-form toolkit moves (at most 3 draws per round), yielding to a
+thread already mid-flight; unsettled candidates keep their revival triggers
+and remain `speculative` until nominated — the backlog is a working queue,
+not a promotion.
 
 ### promoter
 A fresh-context agent, run alongside the panel, whose job is to push the
@@ -367,9 +382,25 @@ later round, the literature, or the user). Distinguished as **opinion-kill**
 correct behavior). The auditor reports both; any opinion-kill is a protocol
 alarm.
 
-### canary panel
-A panel seeded with a known-false claim to measure the panel's real detection
-rate. Mandatory once per project, before the first normal-mode delivery.
+### canary gate
+The per-delivery calibration of the review panel, folded into every
+normal-tier panel: one seeded known-false claim plus one planted step-error
+ride inside the review batch (both excluded from the real record and the
+manuscript). The manuscript may not be delivered unless the panel catches
+the claim (≥ 80%) and the step-error (100%, with the step cited); a miss
+blocks delivery and is classified opinion-vs-evidence in the ledger. The
+running detection rate is recorded in the delivery note.
+
+### post-delivery check
+The background grounding audit run after delivery, during the user's
+decision point (off the round's critical path): (1) a **novelty
+spot-check** re-runs a sample of the delivered `novel`/`extension` verdicts
+(one in three) through M11 against the literature map and the
+known-vs-negation check, recording false-`novel` / false-`known` events so
+the error rates accumulate in the ledger; (2) a **numerics audit** verifies
+that the register's scripts exist, agree, and were written by a role other
+than the theory agent, with run logs attached. The numerics artifacts are a
+delivery prerequisite; the audit verifies it, it does not re-run proofs.
 
 ### high-level check report
 The verdict produced by the independent high-level check agent on novelty and

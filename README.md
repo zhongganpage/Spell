@@ -1,26 +1,35 @@
-# Spell — An Adversarial Cross-Review Proof Generation Protocol
+# Spell — Adversarial Multi-Agent Proof Protocol
 
-Spell is a **universal protocol that enhances proof generations** based on adversarial
-multi-agent cross-review procedures. You can use it on ANY agentic systems such as
-Claude Code, CodeX, Kimi Code and etc, and you can personalize it in whatever way you want by using these agents.
+> A rough idea in → a heavily-attacked manuscript out. Runs on any agentic
+> system: Claude Code, Codex, Kimi Code, …
 
-Every round runs in one of three
-**tiers** — **screening** (per-claim claim-reviewer review), **fast** (a
-2-agent A/B attack/rebut loop), or **normal** (the 5-agent panel, phases A–F,
-plus the high-level check) — auto-selected from the round type at round start
-with your override, and is timed automatically — the round time with its
-phase breakdown is shown at the end of every round in every tier. My personal experience is that for
-Kimi Code + Deepseek-v4-flash, it will output a fine manuscript within 2
-hours and the cost is less than 1 US dollar. Have fun :)
+Spell is a **proof protocol, not a proof checker**: adversarial agents
+attack your draft, attack each other's attacks, and rebut. The output is
+reviewed prose — never a machine-checked proof. Be honest about what that
+means: the reviewers are LLMs whose error-detection rate is not yet
+calibrated, and novelty checking is the protocol's known weak point. A
+Spell manuscript is *attacked*, not *verified*.
 
-> **Input:** a rough idea or a manuscript → **Output:** a finer manuscript.
+- **Adversarial by design** — every claim is attacked; every attack is
+  attacked back.
+- **Ideas survive opinion** — no verdict kills an idea: only a demonstrated
+  counterexample is terminal; `fail`ed directions demote with revival
+  triggers, every death deposits its fragments, and the wild-ideas register
+  keeps ≤ 15 active ideas alive for revival. (Design guarantee — compliance
+  is not yet audited.)
+- **Portable** — roles, phases, and rules; no model or harness lock-in.
+- **Three tiers per round** — screening (per-claim) · fast (2-agent A/B) ·
+  normal (full 5-agent panel) — proposed from the round type, with your
+  override.
+- **Honest about cost** — personal experience: Kimi Code +
+  Deepseek-v4-flash produced a manuscript draft in ~2 h for under $1. The
+  protocol itself has not yet been benchmarked end-to-end on a real
+  problem.
 
-Spell is a **proof protocol**, not a proof checker: it does not run Lean/Coq
-verification — the output is reviewed prose, never a machine-checked proof.
-Although it does not completely prove the theorems for you, the cross-review panel will help you
-materialize the rough ideas properly in the current literature, visualize
-the potential gaps and even detect nuance directions. You can use it for multiple rounds and add new ideas when
-needed to deepen your thoughts. 
+What you get: a process that attacks your ideas, drags gaps into the open,
+and records every dead end — a stronger draft and a visible record of where
+the argument stands. What you don't get: a certificate. The protocol is
+designed and specified; its real-world performance is still unmeasured.
 
 ## What it is
 
@@ -128,13 +137,19 @@ note enters the record, and Phase E and Phase F read it.
 
 - **Working loop** — persistence protocol: dossier, attempts log, a Pólya-style
   transformation toolkit (compute examples, specialize, reformulate, …), a
-  stuck ladder with a minimum-output floor, anti-give-up rules, and delegation
-  of tedious work to sub-agents (drafts stay high-level; manuscript sub-agents
-  fix contradictions between agents). Each round opens with an **idea
-  sprint** hard-capped at 10 minutes wall-clock: 3–5 explorer agents plus a
-  recombination agent propose candidate attacks, each with the cheapest
-  discriminating test; all candidates — survivors and discards — enter the
-  wild-ideas register with revival triggers. A **manuscript input** skips
+  stuck ladder with a minimum-output floor, anti-give-up rules. The author is
+  a **planner**: it plans each session's work in advance, distributes it —
+  massive or tedious tasks go to background sub-agents (mandatory, not
+  optional) — and integrates the results before writing (every outcome
+  traceable, conflicts reconciled; drafts stay high-level; manuscript
+  sub-agents fix contradictions between agents). Each round opens with an **idea
+  sprint** hard-capped at 30 minutes wall-clock: 3–5 explorer agents plus a
+  recombination agent propose candidate attacks, each with a cheapest
+  discriminating test where one exists (fields optional); all candidates —
+  survivors and discards — enter the
+  wild-ideas register with revival triggers, and survivors form the round's
+  **sprint backlog** — the top of the attack queue, settled by the loop
+  before free-form moves. A **manuscript input** skips
   this loop and the draft, entering the hygiene linter and the panel directly
   — shorter rounds. The input document is converted into `question.md` at
   round 1, and each round appends its subgoals to it.
@@ -156,7 +171,11 @@ note enters the record, and Phase E and Phase F read it.
   only for a load-bearing condition) · **normal** (the full panel plus the
   high-level check; required for load-bearing or manuscript-bound claims).
 - **Verification** — every claim runs `speculative → promising → claimed →
-  under-review → accepted | rejected | counterexample`. `speculative` ideas
+  under-review → accepted | rejected | counterexample`. Every normal-tier
+  panel carries a **canary gate** (a seeded known-false claim + one planted
+  step-error must be caught — ≥80% / 100% with the step cited — or the
+  manuscript is not delivered), and delivered `novel` claims are
+  spot-checked after delivery. `speculative` ideas
   live in the wild-ideas register, exempt from the verification ledger and
   panel attack until nominated; `promising` claims may be built upon
   heuristically in exploration (every use labeled `heuristic use of <claim
@@ -263,7 +282,9 @@ skills/spell/
   per run (chosen at project start) — every run ends with a deliverable and a
   decision list for you. At round 1 you choose how many rounds to run
   (`ROUNDS`, 1–10; recommended ≤ 10 to stay inside the context window); each
-  round records its start time and reports its elapsed time at the end.
+  round records its start time, closes with a single atomic **round-close**
+  record (timing, subgoals, decisions, and ledger rows in one pass), and
+  reports its elapsed time at the end.
 - **Recording is mandatory.** Progress is measured in dossier entries, not
   solutions; dead ends and rejections are data.
 - **Everything is versioned.** Every draft, report, manuscript, change list,

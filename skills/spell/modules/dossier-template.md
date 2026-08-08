@@ -91,7 +91,11 @@ from panel attack; they leave the register **only by nomination** (to
 revival triggers and re-checked only when a trigger fires or the idea-yield
 ranking promotes them. Fragments of every terminal verdict (fragments rule:
 maximal true subcase, obstruction, closest technique) and every idea-sprint
-candidate (survivors and discards) land here with revival triggers.
+candidate (survivors and discards) land here with revival triggers. Sprint
+survivors also form the round's **sprint backlog** — the top of the attack
+queue (Open threads below); a candidate settled by its discriminating test
+is marked `settled (round N)` and leaves the backlog, the rest keep their
+triggers.
 
 | id | idea | source (thread/move) | status (active/archived) | revival trigger | last touched |
 
@@ -110,9 +114,21 @@ Every numerical claim carries an **exact-case reproduction** embedded in its
 script; **load-bearing numbers carry two independent scripts**; role
 separation — the agent that builds the theory is not the agent that writes
 the verification scripts. All agents **cite the shared, versioned
-norms/solver file**: the notation lock is enforced, not just claimed.
+norms/solver file**: the notation lock is enforced, not just claimed. The
+scripts, their author roles, and their run logs are a **delivery
+prerequisite**: the post-delivery check audits them (exist, agree,
+role-separated) and the audit rows land in Post-delivery checks below.
 
-| claim | exact-case reproduction (embedded) | independent script count | shared solver cited | verdict |
+| claim | exact-case reproduction (embedded) | independent script count | script paths | author role (≠ theory agent) | run log | verdict |
+
+## Post-delivery checks
+
+The background grounding audit run after delivery during the user's decision
+point (off the round's critical path; `prompts.md` §16). Record the
+novelty spot-checks (one in three of delivered `novel`/`extension` verdicts)
+and the numerics audit per round.
+
+| date | round | novelty spot-checked claims (verdict: novel-confirmed / known / extension-of, locator) | false-known / false-novel events | numerics audit (pass/fail per claim) | run log refs |
 
 ## Attempts log
 
@@ -123,6 +139,12 @@ implies: ...
 next:    ...
 
 ## Delegated tasks
+
+Writers (working-loop author, manuscript agent M) record their **plan** here
+at the start of every session: the task list, which sub-agent owns each, and
+the outcome. The draft/manuscript cites this table and marks every
+integrated outcome; a writer that did not plan, distribute, and integrate
+is in protocol violation.
 
 | date | task (what was asked) | sub-agent (model/backend) | result / where recorded | implications |
 
@@ -184,7 +206,28 @@ Fast and screening rounds have no high-level check phase.
 | 1 (fast) | 2026-08-08T08:55:00+08:00 | 2026-08-08T09:05:00+08:00 | 10 min | sprint 1m · draft 1m · attack 3m · manuscript (M, streamline folded) 3m · linter 1m (no check) |
 | 1 (normal) | 2026-08-08T09:10:00+08:00 | 2026-08-08T09:24:00+08:00 | 14 min | sprint 1m · draft 1m · attack 3m · manuscript (M, streamline folded) 3m · linter 1m · check 4m |
 
+## Round close (atomic — one pass, at the round-end phase boundary)
+
+The round closes with a **single atomic write** — one section generated in
+one pass, never as separate rituals: the timing table above, the dated
+subgoals (appended to `question.md`), the decision list, and the ledger
+rows this round changed. The user-facing closing message is derived from
+this section, not written separately.
+
+- **Round N:** started / ended / elapsed (from the timing table)
+- **Sprint:** backlog draws (≤ 3) · settled candidates · overrun discards
+- **Subgoals (round N):** <appended to question.md, verbatim>
+- **Decision list:** <continue · redirect · repair · park · re-scope · stop
+  — one or more, with the routing>
+- **Ledger rows:** <panel & check row, claims changes, portfolio re-rank —
+  pointer, not copies>
+- **Deliverable:** <artifact + version, or negative-value assessment, or
+  progress report>
+
 ## Open threads / next steps
+
+After an idea-sprint round, the top of the queue is the **sprint backlog**
+(≤ 3 draws per round; yields to mid-flight threads).
 
 - **T1** <thread description> — state: active — next: <concrete step>
 - **T2** <thread description> — state: stalled <date> — resume: <one line>
@@ -194,7 +237,9 @@ Fast and screening rounds have no high-level check phase.
 Models per role and diversity achieved · checks run and verdicts · claims
 still `claimed`/`under-review` · computed vs. opined · fetched vs. remembered
 · formalization status · tier (screening/fast/normal) and any confidence
-downgrade
+downgrade · **canary gate** (detection rate; any miss classified opinion- vs
+evidence-kill) · **post-delivery check** (novelty spot-checks run and
+findings, numerics audit pass/fail)
 ```
 
 Example attempts-log entry:

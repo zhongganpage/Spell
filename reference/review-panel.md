@@ -318,12 +318,21 @@ input artifact for v1. M writes the **manuscript**, under these obligations:
    the original step intact. Every material simplification is appended to
    `changelog-vN.md` with context "streamlining"; if nothing needs
    simplifying, M says so.
-5. **Delegation and contradiction repair.** M may spawn sub-agents for
-   tedious work (`protocol.md` §5.1). Its sub-agents do not merely record the
-   contradictions between the panel agents — the review reports,
-   cross-judgements, and rebuttals — they attempt to fix them: verify the
-   disputed claim, repair the gap, or determine which side is right. What
-   cannot be fixed is recorded honestly as an open item with the reason.
+5. **Planning, delegation, integration, and contradiction repair.** M is a
+   **planner**: before writing, it states its plan — decompose the
+   manuscript into tasks (verify disputed claims, re-run computations,
+   repair gaps, streamline sections, writing blocks) — and distributes it:
+   massive or tedious tasks must go to background sub-agents
+   (`protocol.md` §5.1); small tasks M does itself. M's sub-agents do not
+   merely record the contradictions between the panel agents — the review
+   reports, cross-judgements, and rebuttals — they attempt to fix them:
+   verify the disputed claim, repair the gap, or determine which side is
+   right. What cannot be fixed is recorded honestly as an open item with
+   the reason. **Integration is mandatory:** M collects every sub-agent's
+   written result before finalizing (a missing result is re-run or recorded
+   as an open item, never silently dropped), reconciles conflicts, and
+   cites each integrated outcome to its delegation. The change list records
+   the plan, the delegations, and the integration.
 6. **Ranking deviations are visible.** If M disagrees with an item in R's
    ranking, it does not silently drop it: the manuscript flags the
    disagreement `[ranking deviation]` with a reason, so the user can audit.
@@ -371,7 +380,10 @@ Phase F, in the same pass as the surgical patch (obligation 4): the
 manuscript writer streamlines the manuscript it is writing. There is no S
 phase and no S row in the panel ledger.
 
-M streamlines while writing:
+M streamlines while writing. The streamline sub-tasks are part of M's plan
+(Phase F, obligation 5) and are distributed like any other: tedious parts
+(redundancy sweeps, dead-end removal) go to sub-agents; substantive
+judgments stay with M.
 
 1. **Extract the core ideas.** State the main theorem and the proof skeleton
    plainly at the top; make the architecture of the argument visible.

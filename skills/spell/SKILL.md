@@ -122,7 +122,11 @@ deliverable/decision-list message, e.g. `Round 1: 08:55 → 09:05, elapsed
 ~10 min (draft 1m · attack 3m · manuscript 3m · linter 1m)`, always
 including the total and, when available, the phase breakdown. Timestamps
 are wall-clock times the orchestrator reads at the moment of the event
-(e.g. `date`), recorded in a fixed format.
+(e.g. `date`), recorded in a fixed format. The round close is a **single
+atomic write**: the timing table + dated subgoals (appended to question.md)
++ decision list + ledger rows, generated in one pass from the template
+(`modules/dossier-template.md`, "Round close"); the closing message is
+derived from it, never written as a separate ritual.
 
 ## Working loop
 LOAD dossier + question.md → ATTACK one toolkit move (`./modules/toolkit.md`) → RECORD
@@ -130,16 +134,41 @@ LOAD dossier + question.md → ATTACK one toolkit move (`./modules/toolkit.md`) 
 stuck ladder → floor (trial proof with `GAP:` labels, or a worked example).
 Never end a session on failure; end on the next action.
 
+The author is a **planner**: at session start it decomposes the top next
+step into concrete tasks (computations, literature sweeps, case checks,
+sub-proofs, writing blocks), states the plan, and distributes the work —
+massive or tedious tasks go to background sub-agents (M12, §5.1), each
+with a precise written task and a dossier entry for its result; small
+tasks the author does itself. Integration is mandatory: before the draft
+is finished the author collects every sub-agent's artifact (a missing
+result is re-run or recorded as an open item, never silently dropped),
+reconciles conflicts between results, and makes each outcome traceable to
+its delegation. The draft records the plan, the delegations, and the
+integration, not the mechanics. A session whose work was not planned,
+distributed, and integrated is a protocol violation.
+
 ## Idea sprint
-At round start, a parallel sprint **hard-capped at 10 minutes wall-clock**:
+At round start, a parallel sprint **hard-capped at 30 minutes wall-clock**:
 3–5 explorer agents (specialize / reformulation hunter / analogy-transfer —
 which also evaluates revival triggers / wildcard) plus a **recombination
 agent** pairing unrelated dossier entries. Each candidate returns with the
-cheapest discriminating test; survivors and discards alike enter the
+cheapest discriminating test where one exists — the field is optional, and
+dead ends and partial leads count; survivors and discards alike enter the
 **wild-ideas register** with revival triggers. The sprint feeds the
 GAP-owner; it does not open new target queues. The orchestrator records the
-sprint start, cuts artifact collection off at the 10-minute mark, and
+sprint start, cuts artifact collection off at the 30-minute mark, and
 discards any late artifact (recorded `sprint overrun — discarded`).
+Surviving candidates become the **sprint backlog** — the top of the round's
+attack queue — settled by the working loop this round, not parked in the
+register.
+
+## Sprint backlog
+The round's sprint survivors, each with its cheapest discriminating test,
+ranked at the top of the attack queue. The working loop draws from the
+backlog before free-form toolkit moves; at most 3 draws per round, then the
+loop is free; the backlog yields to a thread already mid-flight (§4.1);
+unsettled candidates keep their revival triggers and stay `speculative`
+until nominated — the backlog is a working queue, not a promotion.
 
 ## Hygiene linter
 A deterministic mechanical pass (one cheap agent/script), run before any
@@ -169,11 +198,17 @@ against the manuscript's own tables and the notation lock. Not a reviewer.
 5. **Everything is versioned.** Every draft, report, manuscript, change list,
    and update to the problem statement carries a version (`v1`, `v2`, …);
    cite the version you build on.
-6. **Delegate the tedious; stay high-level.** A massive or tedious task that
-   still leaves distance to the goal → spawn a sub-agent, keep thinking
-   high-level, record its result in the dossier. Draft sub-agents record
-   contradictions honestly; manuscript sub-agents fix contradictions between
-   the panel agents.
+6. **Writers are planners and integrators; reviewers are not.** The
+   working-loop author and M plan their work in advance — decompose the
+   artifact into tasks, state the plan, distribute: massive or tedious
+   tasks go to background sub-agents (M12, §5.1), small ones the writer
+   does itself — and integrate before writing: every sub-agent result
+   collected, conflicts reconciled, each outcome traceable; the artifact
+   records the plan, the delegations, and the integration, not the
+   mechanics. Draft sub-agents record contradictions honestly; manuscript
+   sub-agents fix contradictions between the panel agents. Reviewers
+   (panel, high-level check) are not planners: they stay single-shot, no
+   planning, no delegation.
 7. **Agents run in the background — explicitly.** Every agent Spell spawns —
    panel reviewers, the promoter, R, M, sub-agents, the high-level check,
    the auditor — is launched with the harness's explicit background/async
@@ -188,8 +223,14 @@ against the manuscript's own tables and the notation lock. Not a reviewer.
    protocol alarm, evidence-kills are correct behavior), evaluates the
    **revival triggers** on demoted/archived ideas, and computes the
    **idea-yield** metric (accepted claims + promoted ideas + new subgoals per
-   unit cost). A **canary panel** (seeded known-false claim) is mandatory once
-   per project, before the first normal-tier delivery. Record what you find.
+   unit cost). A **canary gate** runs inside every normal-tier panel: a
+   seeded known-false claim plus one planted step-error ride in the review
+   batch (both excluded from the real record and the manuscript), and the
+   manuscript may not be delivered unless the panel catches the claim
+   (≥ 80%) and the step-error (100%, with the step cited); a miss blocks
+   delivery and is classified opinion- vs evidence-kill in the ledger; the
+   running detection rate is recorded in the delivery note. Record what you
+   find.
 9. **Artifacts are files; the orchestrator guarantees them.** Every agent
    that produces an artifact — panel reviewers, the promoter, R, M,
    sub-agents, the high-level check, the auditor — is spawned with an
@@ -295,6 +336,18 @@ negative rounds replace it with the negative-value assessment.** The check
 agent must write its report to a file and confirm the write; a read-only
 check agent delivers the report text in its final message and the
 orchestrator persists it verbatim (Invariant rule 9).
+
+## Post-delivery check
+After delivery, during the user's decision point (off the round's critical
+path), one cheap background agent runs two grounding audits: (1) **novelty
+spot-check** — a sample of the delivered `novel`/`extension` verdicts (one
+in three) is re-run through M11 against the literature map and the
+known-vs-negation check; false-`novel` / false-`known` events are recorded
+so the error rates accumulate in the ledger; (2) **numerics audit** — the
+register's scripts are verified to exist, agree, and be written by a role
+other than the theory agent, with run logs attached. The numerics artifacts
+are a delivery prerequisite; the audit verifies it, it does not re-run
+proofs. Results are recorded in the dossier and read by the next round.
 
 ## Layout
 This package: `SKILL.md` (this file — always load) · `modules/` (on-demand,

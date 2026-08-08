@@ -197,7 +197,7 @@ panel/author agent (§9). No `conditional` verdict ever auto-continues into a
 full new round.
 
 **The idea sprint.** The working loop opens with the **idea sprint**, a
-parallel phase **hard-capped at 10 minutes wall-clock**, enforced by the
+parallel phase **hard-capped at 30 minutes wall-clock**, enforced by the
 orchestrator (sprint start recorded; collection cut off at the mark; a late
 artifact is discarded and recorded `sprint overrun — discarded`): 3–5
 **explorer agents** (flash models fine) — specialize/edge-case miner,
@@ -206,8 +206,11 @@ register and the literature map; evaluates revival triggers), wildcard —
 plus a **recombination agent** pairing unrelated dossier entries (two
 reformulations; an obstruction + a partial result; an idea + a technique
 that worked elsewhere). Each candidate returns with the *cheapest
-discriminating test*. The sprint **feeds the GAP-owner; it does not open new
-target queues**. All candidates — survivors and discards — enter the
+discriminating test* where one exists — the field is optional, and dead
+ends and partial leads count. The sprint **feeds the GAP-owner; it does not open new
+target queues**; its surviving candidates become the **sprint backlog** —
+the top of the round's attack queue (§4) — settled by the loop this round,
+not parked in the register. All candidates — survivors and discards — enter the
 **wild-ideas register** with revival triggers (§3), which is capped at
 **≤ 15 active** wild ideas; the rest are archived and re-checked only when a
 trigger fires or the idea-yield ranking promotes them.
@@ -344,6 +347,14 @@ at the top as a highlighted "Key changes" list. The change list is written by
 the manuscript agent in Phase F (`review-panel.md`) and its version is
 recorded in the panel ledger row.
 
+**The round close.** Every round closes with a **single atomic write**: the
+round-timing table, the dated subgoals (appended to question.md), the
+decision list, and the ledger rows the round changed, generated in one pass
+at the round-end phase boundary from the fixed template
+(`modules/dossier-template.md`, "Round close"). The user-facing closing
+message is derived from that record, never written as a separate ritual —
+the "deliverable + decision list" contract (§2) is one write, not five.
+
 ## 4. The exploration loop
 
 Every session — and every hour of a long session — runs this loop:
@@ -354,6 +365,18 @@ Every session — and every hour of a long session — runs this loop:
 3. RECORD   append the outcome to the attempts log (2–5 lines)
 4. UPDATE   adjust status, examples, or reformulations if warranted
 5. NEXT     write the next concrete step
+```
+
+**The sprint backlog.** When the round ran an idea sprint, its surviving
+candidates (each carrying its cheapest discriminating test) form the
+**sprint backlog** — the top of the round's attack queue — and the loop
+draws from it before free-form toolkit moves: a candidate is settled by
+running its discriminating test. The backlog yields to a thread already
+mid-flight (a fresh attack never interrupts one in progress); at most 3
+backlog draws per round, after which the loop is free; unsettled candidates
+keep their revival triggers in the wild-ideas register. Backlog candidates
+remain `speculative` until nominated — the backlog is a working queue, not a
+promotion (§8).
 ```
 
 ### 4.1 Session start
@@ -398,13 +421,25 @@ one, is recorded. This is the repertoire that answers "no next move".
 The moves M1–M12 are defined in `modules/toolkit.md`; the delegation rule
 that M12 invokes is spelled out below (§5.1).
 
-### 5.1 Delegating tedious work
+### 5.1 Writers are planners; delegation is mandatory for them
+
+**Writers** — the working-loop author (drafts) and the manuscript agent M —
+are **planners**: before executing, they decompose the artifact into
+concrete tasks (computations, literature sweeps, mechanical case checks,
+routine sub-proofs, writing blocks), state the plan, and distribute the
+work. Massive or tedious tasks that still leave distance to the goal
+**must** go to background sub-agents; small tasks the writer does itself.
+A draft or manuscript whose work was not planned and distributed is a
+protocol violation. **Reviewers and other pipeline agents** — the panel
+reviewers (A1, A2, X/A3), R, the promoter, the high-level check — are
+**not** planners: they stay single-shot and do not delegate; the provisions
+below apply to writers' sub-agents only.
 
 When the next attack consists of a massive or tedious task — a long
 computation, a mechanical case check, a literature sweep, a routine sub-proof
-— and completing it still leaves a distance to the ultimate goal, the agent
-in charge **delegates it to a sub-agent** instead of sinking its own run into
-the details:
+— and completing it still leaves a distance to the ultimate goal, the writer
+**delegates it to a sub-agent** instead of sinking its own run into the
+details:
 
 1. **Spawn a sub-agent in the background — explicitly.** Open a fresh
    context/session with the harness's explicit background/async spawn — in
@@ -416,32 +451,50 @@ the details:
    written task, and nothing comes back except the written result.
 2. **Keep thinking high-level.** The delegating agent does not wait idly: it
    continues the high-level line — next moves, reformulations, the shape of
-   the artifact — while the sub-agent works, then integrates the result when
-   it arrives.
+   the artifact — while the sub-agent works.
 3. **Sub-agents never grade, never vote.** A delegated result is evidence
    recorded in the dossier — it is not a verification verdict and does not
    bypass the claims ledger (§8). Verification still happens in independent
    sessions with fresh contexts (§8, §11).
+4. **Integrate — mandatory, not optional.** Before the artifact is finished,
+   the writer: (a) collects every planned sub-agent's written result — a
+   missing result is re-spawned or recorded as an open item, never silently
+   dropped; (b) reconciles conflicts between sub-agent results and against
+   the record — drafts record contradictions honestly, M verifies / repairs /
+   decides which side is right; (c) makes every sub-agent outcome that
+   appears in the artifact traceable to its delegation (dossier entry); (d)
+   writes the artifact only after integration — a result arriving while the
+   writer is mid-write triggers a revision pass, not a silent
+   incorporation.
 
-**In drafts (working loop).** The author delegates so the draft stays
-high-level: the draft records the delegation, not the mechanics — what was
-delegated, what came back, and what it implies. The details live in the
-dossier's delegated-task entries (`modules/dossier-template.md`, "Delegated
-tasks"); the draft cites them by reference. If a sub-agent's result shows the
-high-level idea is wrong — a counterexample, a failed case, a violated lemma
-— the draft reports the contradiction honestly: the direction, what the
-detail killed, and what still stands. A draft that hides a delegated
-contradiction is worse than one that reports failure (R3: dead ends that are
-written down are work).
+**In drafts (working loop).** The author is a planner: it plans the draft's
+work in advance, distributes it (mandatory, §5.1), integrates the results
+before the draft is finished, and writes the draft so it stays high-level:
+the draft records the plan, the delegations, and the integration, not the
+mechanics — what was planned, what was delegated, what came back, how it
+was reconciled, and what it implies. The details live in the dossier's
+delegated-task entries
+(`modules/dossier-template.md`, "Delegated tasks"); the draft cites them by
+reference. If a sub-agent's result shows the high-level idea is wrong — a
+counterexample, a failed case, a violated lemma — the draft reports the
+contradiction honestly: the direction, what the detail killed, and what
+still stands. A draft that hides a delegated contradiction is worse than
+one that reports failure (R3: dead ends that are written down are work).
 
-**In manuscripts (Phase F).** The manuscript agent may delegate tedious work
-the same way, and its sub-agents carry an extra mandate: they **not only
-record** the contradictions between the panel agents — the review reports,
-cross-judgements, and rebuttals — they **attempt to fix them**. For each
-contradiction a sub-agent verifies the disputed point, repairs the gap, or
-determines which side is right, and hands the settled version back for the
-manuscript. What cannot be fixed is recorded honestly as an open item, with
-the reason (`review-panel.md`, Phase F).
+**In manuscripts (Phase F).** The manuscript agent is a planner: it plans
+the manuscript's work in advance (verify disputed claims, re-run
+computations, repair gaps, streamline sections, writing blocks), distributes
+it (mandatory, §5.1), and its sub-agents carry an extra mandate: they
+**not only record** the contradictions between the panel agents — the
+review reports, cross-judgements, and rebuttals — they **attempt to fix
+them**. For each contradiction a sub-agent verifies the disputed point,
+repairs the gap, or determines which side is right, and hands the settled
+version back for the manuscript. What cannot be fixed is recorded honestly
+as an open item, with the reason (`review-panel.md`, Phase F). Integration
+is mandatory: M collects every sub-agent's written result before the
+manuscript is finished, reconciles conflicts, and cites each outcome to
+its delegation. The change list records the plan, the delegations, and the
+integration.
 
 **The formalization anchor.** At least one load-bearing lemma per project is
 delegated for Lean 4/mathlib formalization (an M12 delegation,
@@ -575,10 +628,16 @@ speculative → promising → claimed → under-review → accepted | rejected |
   the rate distinguishes **opinion-kills** (verdict-based; a process defect)
   from **evidence-kills** (counterexample-based; correct behavior). The
   auditor also evaluates revival triggers at each run and computes the
-  idea-yield metric (§3). One **canary panel** — a seeded known-false claim
-  — is mandatory before the first normal-mode delivery on a new project; it
-  measures the panel's real detection rate. Results are recorded in the
-  dossier and fed back as standing panel instructions.
+  idea-yield metric (§3). A **canary gate** runs inside every normal-tier
+  panel: the review batch is seeded with one known-false claim plus one
+  planted step-error (both excluded from the real record and the
+  manuscript), and the round's manuscript may not be delivered unless the
+  panel catches the claim (≥ 80%) and the step-error (100%, with the step
+  cited). A miss blocks delivery and is classified in the panel ledger as
+  an opinion-kill (verdict-based; protocol alarm) or evidence-kill
+  (counterexample-based; correct behavior); the running canary rate is
+  recorded in the delivery note. Results are recorded in the dossier and
+  fed back as standing panel instructions.
 - **Diversity is recorded.** Every panel and review row carries the
   reviewer's model/backend, its role (A1 counterexample hunter, A2 step
   validator, A3 architecture critic, X exterior, or fast-mode A/B), and
@@ -595,6 +654,18 @@ with the streamline step folded into M (§2), and gated by the high-level
 check (`high-level-check.md`). A panel verdict or a high-level
 check `pass` is independent review — much stronger than self-checking, but
 never a formal proof, and it never overrides a rejected claim in the ledger.
+
+**Post-delivery grounding check.** After delivery, during the user's
+decision point (off the round's critical path), one cheap background agent
+runs two audits: (1) **novelty spot-check** — a sample of the delivered
+`novel`/`extension` verdicts (one in three) is re-run through M11 against
+the literature map and the known-vs-negation check; false-`novel` /
+false-`known` events are recorded so the error rates accumulate in the
+ledger; (2) **numerics audit** — the register's scripts are verified to
+exist, agree, and be written by a role other than the theory agent, with
+run logs attached (the numerics artifacts are a delivery prerequisite; the
+audit verifies it, it does not re-run proofs). Results are recorded in the
+dossier and read by the next round.
 
 ## 9. Agent mechanics
 

@@ -155,11 +155,19 @@ Write the manuscript from the ranking and the record below. Obligations:
    You may carry a `[speculative developments]` appendix whose entries are
    flagged, not forced through this obligation — speculative content only;
    the exemption never covers load-bearing claims.
-3. Contradiction repair — you may spawn sub-agents for tedious work; they do
-   not merely record contradictions between the agents (reports,
-   cross-judgements, rebuttals) but attempt to fix them — verify the disputed
-   claim, repair the gap, or determine which side is right. What cannot be
-   fixed is recorded honestly as an open item.
+3. Plan, delegate, integrate — you are a planner: before writing, state
+   your plan (decompose the manuscript into tasks: verify disputed claims,
+   re-run computations, repair gaps, streamline sections, writing blocks)
+   and distribute it. Massive or tedious tasks must go to background
+   sub-agents (protocol.md §5.1); small tasks you do yourself. Your
+   sub-agents do not merely record contradictions between the agents
+   (reports, cross-judgements, rebuttals) but attempt to fix them — verify
+   the disputed claim, repair the gap, or determine which side is right.
+   What cannot be fixed is recorded honestly as an open item. Integration
+   is mandatory: collect every sub-agent's written result before finalizing
+   (a missing result is re-run or recorded as an open item), reconcile
+   conflicts, and cite each integrated outcome to its delegation. The
+   change list records the plan, the delegations, and the integration.
 4. Ranking deviations are visible — if you disagree with a ranked item, flag
    it [ranking deviation] with a reason; never drop it silently.
 5. Include a section "How this manuscript improves on the initial artifact
@@ -243,10 +251,10 @@ Read the ledgers below and compute:
 3. Per-reviewer agreement — for each role (A1 counterexample hunter, A2 step
    validator, A3 architecture critic, X exterior), how often did its verdict
    agree with the final outcome?
-4. Detection — were seeded canary claims (known-false) caught? The canary
-   panel is mandatory once per project, before the first normal-mode
-   delivery: if no canary has run yet and the project is at or past that
-   point, that is a compliance finding.
+4. Canary gate — for every normal-tier panel, were the seeded known-false
+   claim (≥ 80% required) and the planted step-error (100%, step cited)
+   caught? Any miss is a blocking finding: classify it opinion- vs
+   evidence-kill and record the running detection rate in the delivery note.
 5. Premature kills — ideas `rejected` / `fail`ed / parked that later proved
    right (in a later round, the literature, or by the user), counted every
    run and classified as opinion-kill (verdict-based; a process defect —
@@ -315,9 +323,14 @@ proof as far as you can. Obligations:
 Round <N> of a fast-mode Spell run. You are the author-critic: you attack
 the current artifact and write the improved manuscript.
 
-Round 1: write the draft for the problem below (high-level; delegate tedious
-work; record dead ends). A manuscript input skips the draft — round 1 then
-proceeds as in rounds N >= 2.
+Round 1: write the draft for the problem below. You are a planner: before
+writing, state your plan — decompose the draft into tasks (computations,
+literature sweeps, case checks, writing blocks) — and distribute it;
+massive or tedious tasks must go to background sub-agents (protocol.md
+§5.1), small ones you do yourself. Integrate before the draft is finished:
+collect every sub-agent's written result, reconcile conflicts, cite each
+outcome to its delegation; record dead ends. A manuscript input skips the
+draft — round 1 then proceeds as in rounds N >= 2.
 Rounds N >= 2: attack the received manuscript — every theorem, lemma, claim,
 computation, and nonstandard definition, each tagged sound | gap | flaw |
 unjustified | false; hunt concrete counterexamples; cite precisely.
@@ -439,12 +452,14 @@ version" note.
 
 ## 13. Idea sprint — explorer agents (×4, parallel, at round start)
 
-Parallel sprint at round start, **hard-capped at 10 minutes wall-clock** —
+Parallel sprint at round start, **hard-capped at 30 minutes wall-clock** —
 the orchestrator records the sprint start, cuts collection off at the mark,
 and discards late artifacts (`sprint overrun — discarded`). Flash models are
-fine. Each explorer returns 3–5 candidate attacks, each with the
-cheapest discriminating test that would settle it and a revival trigger
-(`re-examine when <event>`). All candidates — survivors and discards —
+fine. Survivors form the round's **sprint backlog** — the top of the attack
+queue, settled by the working loop before free-form moves. Each explorer
+returns 3–5 candidate attacks; every field is optional (a candidate may
+omit its discriminating test or its revival trigger, and dead ends and
+partial leads count). All candidates — survivors and discards —
 enter the wild-ideas register as `speculative`: exempt from the verification
 ledger and from panel attack, leaving only by nomination. Ideas nominated
 for development become `promising` (built upon heuristically, every use
@@ -469,8 +484,10 @@ result there transfers back to the target.
 
 Return 3–5 candidate attacks, each with:
 - the candidate (one paragraph),
-- the cheapest discriminating test that would settle it,
-- a revival trigger (`re-examine when <event>`).
+- the cheapest discriminating test that would settle it — optional,
+- a revival trigger (`re-examine when <event>`) — optional.
+Dead ends and partial leads count as candidates; a candidate missing a test
+or trigger is still recorded.
 
 --- GAP-OWNER TARGET ---
 <target + current state>
@@ -494,8 +511,10 @@ attack.
 
 Return 3–5 candidate attacks, each with:
 - the candidate (one paragraph),
-- the cheapest discriminating test that would settle it,
-- a revival trigger (`re-examine when <event>`).
+- the cheapest discriminating test that would settle it — optional,
+- a revival trigger (`re-examine when <event>`) — optional.
+Dead ends and partial leads count as candidates; a candidate missing a test
+or trigger is still recorded.
 
 --- LOCKED PROBLEM STATEMENT ---
 <problem statement>
@@ -520,8 +539,10 @@ transfers of techniques that worked elsewhere in the dossier.
 
 Return 3–5 candidate attacks (trigger firings count), each with:
 - the candidate (one paragraph),
-- the cheapest discriminating test that would settle it,
-- a revival trigger (`re-examine when <event>`).
+- the cheapest discriminating test that would settle it — optional,
+- a revival trigger (`re-examine when <event>`) — optional.
+Dead ends and partial leads count as candidates; a candidate missing a test
+or trigger is still recorded.
 
 --- OBSTRUCTIONS REGISTER ---
 <obstructions>
@@ -551,8 +572,10 @@ price it.
 
 Return 3–5 candidate attacks, each with:
 - the candidate (one paragraph),
-- the cheapest discriminating test that would settle it,
-- a revival trigger (`re-examine when <event>`).
+- the cheapest discriminating test that would settle it — optional,
+- a revival trigger (`re-examine when <event>`) — optional.
+Dead ends and partial leads count as candidates; a candidate missing a test
+or trigger is still recorded.
 
 --- LOCKED PROBLEM STATEMENT ---
 <problem statement>
@@ -576,8 +599,9 @@ new content.
 Return 3–5 pairings, each with:
 - the two entries (with their dossier locators) and the combined attack
   (one paragraph),
-- the cheapest discriminating test that would settle it,
-- a revival trigger (`re-examine when <event>`).
+- the cheapest discriminating test that would settle it — optional,
+- a revival trigger (`re-examine when <event>`) — optional.
+Dead ends and partial leads count.
 
 --- WILD-IDEAS REGISTER (active entries) ---
 <wild-ideas register>
@@ -618,4 +642,38 @@ revival trigger, into the wild-ideas register.
 
 --- LOCKED PROBLEM STATEMENT ---
 <problem statement>
+```
+
+## 16. Post-delivery check — novelty spot-check + numerics audit
+
+```text
+You run the post-delivery grounding audit for round <N>, in the background
+during the user's decision point (off the round's critical path). You audit
+and record; you never re-prove, never re-review the manuscript.
+
+1. NOVELTY SPOT-CHECK — take the sample of delivered claims below (one in
+   three of the round's `novel`/`extension` verdicts). For each, re-run M11:
+   search its terminology, find the nearest known theorem, read its proof,
+   and check whether the claim (or its negation) is already known. Verdict
+   per claim: `novel-confirmed` | `known (locator)` | `extension-of
+   (locator)`. A later `known` finding is a false-`novel` event: record it,
+   never retract silently.
+2. NUMERICS AUDIT — for each load-bearing number in the register: does the
+   script exist, does its embedded exact-case reproduction run and pass, is
+   there a second independent script, and was the verification script
+   written by a role other than the theory agent? Record pass/fail per
+   claim with the run-log reference.
+
+Record every finding in the dossier (post-delivery checks section): the
+false-known / false-novel events, and the numerics pass/fail rows, each
+dated.
+
+--- DELIVERED MANUSCRIPT (vN, with the high-level-check novelty verdicts) ---
+<manuscript + high-level-check report>
+
+--- NUMERICS REGISTER ---
+<register rows>
+
+--- LITERATURE MAP ---
+<literature map>
 ```

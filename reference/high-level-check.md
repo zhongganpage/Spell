@@ -82,6 +82,11 @@ literature claim carries a locator (arXiv ID / DOI / page). A `novel` or
 `known` verdict without a fetched, locator-carrying source is unsupported —
 at most `conditional`.
 
+Delivered `novel`/`extension` verdicts are spot-checked after delivery (one
+in three) by the **post-delivery check** (`protocol.md` §8); a later `known`
+finding is recorded as a false-`novel` event in the ledger, never a silent
+retraction.
+
 - `novel` — the central idea is not in the literature searched.
 - `extension` — new, but visibly extends a known result; say which.
 - `known` — the result, or an equivalent form, is already in the literature;
