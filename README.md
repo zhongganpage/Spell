@@ -3,6 +3,8 @@
 > A rough idea in → a heavily-attacked manuscript out. Runs on any agentic
 > system: Claude Code, Codex, Kimi Code, …
 
+**Newer version:** the full adversarial proof-exploration protocol [Spell-Explore](https://github.com/zhongganpage/Spell-Explore/tree/main).
+
 Spell is a **proof protocol, not a proof checker**: adversarial agents
 attack your draft, attack each other's attacks, and rebut. The output is
 reviewed prose — never a machine-checked proof. Be honest about what that
